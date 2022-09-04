@@ -1,11 +1,12 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
 <html lang="en">
 
 <head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vite + Vue + TS</title>
-  <script type="module" crossorigin src="./assets/index.cbae88e0.js"></script>
+  <script type="module" crossorigin src="./assets/index.2888eb9d.js"></script>
   <link rel="stylesheet" href="./assets/index.18eba084.css">
 </head>
 
@@ -15,13 +16,20 @@
 
 </body>
 <script>
+  // 禁用双击放大
+  var lastTouchEnd = 0;
   document.documentElement.addEventListener('touchend', function (event) {
     var now = Date.now();
-    if (now - lastTouchEnd <= 300) {
-      event.preventDefault();
+    if (now - lastTouchEnd <= 100) {
+      // event.preventDefault();
+      
     }
     lastTouchEnd = now;
-  }, false);
+  }, {
+    passive: false
+
+  });
+
 </script>
 
 </html>
