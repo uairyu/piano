@@ -9,7 +9,7 @@
 	<button @click="hearAgain" class="control-item">Hear Again</button>
 	<button v-show="passNext" @click="nextNote" class="next control-item ">Hear Next</button>
 	<div class="key-note-container">
-		<button @click="keyNoteClick(index + 1)" v-for="(i,index) in plainKeyName" :key="i" :id="index + 1">{{i}}</button>
+		<button @click="keyNoteClick(index + 1)" v-for="(i,index) in plainKeyName" :key="i" :id="String(index + 1)">{{i}}</button>
 	</div>
 	<div class="control-panel">
 		<button class="control-item" v-text="!isStarted? 'Start Quiz': 'Stop Quiz'" @click="startNewTest"></button>
@@ -80,7 +80,7 @@
 		}
 		isStarted.value=!isStarted.value;
 	}
-	function keyNoteClick(e){
+	function keyNoteClick(e: number){
 		console.log(e);
 		if(isStarted.value){
 			if(e === currentNoteInfo.absNoteIndex){
