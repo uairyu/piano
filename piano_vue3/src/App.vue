@@ -6,7 +6,7 @@
   import { emit } from 'process';
   let kk = ref();
   let volume = ref(100);
-  const keyGroup = ref(null)
+  const keyGroup = ref()
   function getRate(newValue: number): void{
     volume.value = Number((newValue*100 + '').substring(0,5));
   } 
