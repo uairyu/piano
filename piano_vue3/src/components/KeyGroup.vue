@@ -14,9 +14,11 @@
 </template>
 
 <script lang="ts">
-import { nextTick, onMounted, ref } from "vue";
+import { nextTick, onMounted, ref,defineExpose } from "vue";
 export default {
-
+  props:{
+    controlVolume:{type: Number, required: true}
+  },
   name: "KeyGroup",
   setup(props: any , { emit }: any) {
     let keyMapWhite = [
@@ -26,6 +28,8 @@ export default {
       'D2b.ogg', 'E2b.ogg', 'G2b.ogg', 'A2b.ogg', 'B2b.ogg', 'D3b.ogg', 'E3b.ogg', 'G3b.ogg', 'A3b.ogg', 'B3b.ogg', 'D4b.ogg', 'E4b.ogg', 'G4b.ogg', 'A4b.ogg', 'B4b.ogg', 'D5b.ogg', 'E5b.ogg', 'G5b.ogg', 'A5b.ogg', 'B5b.ogg', 'D6b.ogg', 'E6b.ogg', 'G6b.ogg', 'A6b.ogg', 'B6b.ogg',
     ]
     let map: any = {}
+    const maxVolumn = 4
+
     let audioCtx:AudioContext = new AudioContext();
     
     function getData(name: string){
@@ -42,15 +46,25 @@ export default {
     }
     function play(audioBuffer: AudioBuffer){
       let bufferNode: AudioBufferSourceNode = audioCtx.createBufferSource();
+      let gainNode = audioCtx.createGain();
       bufferNode.buffer = audioBuffer;
-      bufferNode.connect(audioCtx.destination);
+      // bufferNode.connect(audioCtx.destination)
+
+      gainNode.gain.value = Math.min(props.controlVolume, maxVolumn);
+      bufferNode.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
       bufferNode.start(0, 0);
     }
     const notePath = "./note/";
+
+    function controlPlay(fullPath: string){
+      play(map[fullPath])
+    }
     let blackPos = [13, 43, 82, 111, 140];
     let iterWhite = 0, iterBlack = 0;
     function processWhiteEl(el: HTMLElement) {
-      if(el.id === ""){
+      if(!el) return;
+      if(el && el.id === ""){
         el.id = iterWhite + '';
         iterWhite++;
       }
@@ -63,7 +77,8 @@ export default {
     }
     
     function processBlackEl(el: HTMLElement) {
-      if (el.id === "") {
+      if(!el) return;
+      if (el && el.id === "") {
         el.id = iterBlack + '';
         iterBlack++;
       }
@@ -75,7 +90,7 @@ export default {
       }
     }
 
-    return { processWhiteEl, processBlackEl, blackPos };
+    return { processWhiteEl, processBlackEl, blackPos, controlPlay };
   },
 };
 </script>

@@ -1,9 +1,7 @@
 <template>
-	<div>rate :{{ props.rate }}</div>
 	<div class="rc scroll-width" ref="scroll">
 		<div class="child-width"></div>
 	</div>
-	<slot :cc='scrollBarValue'></slot>
 </template>
 <script lang='ts'>
 import { popScopeId, ref } from 'vue';
@@ -12,22 +10,28 @@ export default {
 	name: 'scrollbar',
 	emits:['valueChanged'],
 	props:{
-		rate: { type: Number, required: true }
+		maxRate: { type: Number},
+		initRate:{type : Number}
 	},
 	setup(props: any, { emit }: any) {
 		let scroll = ref();
 		let scrollBarValue = ref();
-		console.log(emit);
+		const maxRate = props.maxRate;
+		const initRate = props.initRate;
+		scrollBarValue.value = initRate;
 		onMounted(() => {
-			console.log(props);
+			let scrollEl: HTMLElement = scroll.value;
+			
+			// console.log(scrollEl.offsetWidth);
+			// console.log(scrollEl.scrollWidth);
 			scroll.value.addEventListener('scroll', (e: Event) => {
-				scrollBarValue.value = scroll.value.scrollLeft;
-				emit('valueChanged', scrollBarValue);
+				scrollBarValue.value =  scrollEl.scrollLeft;
+				emit('valueChanged', scrollBarValue.value / (scrollEl.scrollWidth - scrollEl.offsetWidth) * maxRate / 100);
 			})
 
 		})
 
-		return { props, scroll, scrollBarValue };
+		return { props, scroll, scrollBarValue, maxRate };
 	}
 }
 </script>
@@ -37,9 +41,10 @@ export default {
 	@parent-width: 300px;
 	overflow: auto;
 	width: @parent-width;
-
+	
 	.child-width {
-		width: @parent-width * 11;
+		height: 1px;
+		width: @parent-width * 10;
 	}
 }
 

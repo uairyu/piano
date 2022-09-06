@@ -1,36 +1,26 @@
 <script setup lang="ts">
   import {onMounted, ref, reactive} from 'vue';
   import ScrollBar from './components/scrollBar.vue';
-  let audio = new Audio('/bravest.mp3');
-  let scrollBarValue = ref();
+  import PerfectPitch from './components/PerfectPitch.vue'
+  import KeyGroup from '@/components/KeyGroup.vue';
+  import { emit } from 'process';
   let kk = ref();
-  function ff(): void{
-    audio.play();
+  let volume = ref(100);
+  const keyGroup = ref(null)
+  function getRate(newValue: number): void{
+    volume.value = Number((newValue*100 + '').substring(0,5));
+  } 
+  function wantPlay(noteFullPath:string){
+    keyGroup.value.controlPlay(noteFullPath);
   }
-  let volume = 100;
-  setInterval(()=>{
-      volume = audio.volume.valueOf();
-  }, 300)
-
-  onMounted(() => {
-
-  })
-function getRate( newValue: any): void{
-    
-    kk.value = newValue.value;
-  }
+  
 </script>
-
+ 
 <template>
-  <ScrollBar :rate='10' v-slot="kk" @valueChanged='getRate'>
-  </ScrollBar>
-  <p>heh kk: {{kk}}</p>
-  <h1>{{volume}}</h1>
-  <p>scroll value{{ scrollBarValue }}</p>
-  <audio controls>
-    <source src='/bravest.mp3' type='audio/mpeg'>
-  </audio>
-  <button @click="ff"> click </button>
+  <KeyGroup :controlVolume="volume" ref="keyGroup"></KeyGroup>
+  <ScrollBar :initRate="4" :maxRate="4" v-slot="kk" @valueChanged="getRate"></ScrollBar>
+  <p>volume{{volume}}</p>
+  <PerfectPitch @wantPlay="wantPlay"></PerfectPitch>
 </template>
 
 <style lang='less'>
