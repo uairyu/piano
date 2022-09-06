@@ -2,7 +2,7 @@
   import {onMounted, ref, reactive} from 'vue';
   import ScrollBar from './components/scrollBar.vue';
   import PerfectPitch from './components/PerfectPitch.vue'
-  import KeyGroup from '@/components/KeyGroup.vue';
+  import KeyGroup from './components/KeyGroup.vue';
   import { emit } from 'process';
   let kk = ref();
   let volume = ref(100);
