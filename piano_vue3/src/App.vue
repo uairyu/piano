@@ -12,7 +12,9 @@
   } 
   function wantPlay(noteFullPath:string){
     keyGroup.value.controlPlay(noteFullPath);
+    
   }
+  console.log('vvcv');
   
 </script>
  
@@ -24,5 +26,7 @@
 </template>
 
 <style lang='less'>
+  .asda{
 
+  }
 </style>
