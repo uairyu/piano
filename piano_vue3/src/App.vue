@@ -14,8 +14,6 @@
     keyGroup.value.controlPlay(noteFullPath);
     
   }
-  console.log('vvcv');
-  
 </script>
  
 <template>

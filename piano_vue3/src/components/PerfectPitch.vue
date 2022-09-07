@@ -6,19 +6,41 @@
 		<span class='statistic-panel'>时间: {{elapsedTime}} sec</span>
 		<span class='statistic-panel'>Avg time: {{completed}} sec</span>
 	</div>
-	<button @click="hearAgain" class="control-item">Hear Again</button>
-	<button v-show="passNext" @click="nextNote" class="next control-item ">Hear Next</button>
+	<button @click="hearAgain" class="control-item" v-show="isStarted">Hear Again</button>
+	<button v-show="passNext && isStarted" @click="nextNote" class="next control-item ">Hear Next</button>
 	<div class="key-note-container">
-		<button @click="keyNoteClick(index + 1)" v-for="(i,index) in plainKeyName" :key="i" :id="String(index + 1)">{{i}}</button>
+		<button :style="keyNoteCssFunc(index)" @click="keyNoteClick(index + 1)" v-for="(i,index) in plainKeyName" :key="i"
+			:id="String(index + 1)">{{i}}</button>
 	</div>
 	<div class="control-panel">
 		<button class="control-item" v-text="!isStarted? 'Start Quiz': 'Stop Quiz'" @click="startNewTest"></button>
+		<div>
+			<select v-model.number="range[0]">
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+				<option>6</option>
+			</select>
+			<select v-model.number="range[1]">
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+				<option>5</option>
+				<option>6</option>
+			</select>
+		</div>
+		<div>
+			<span style=" display: block">Option</span>
+			<button :style="keyNoteCssFunc(index + 100)" @click="keyNoteOptionClick(index)" v-for="(i,index) in plainKeyName"
+				:key="i" :id="String('open' + (index + 1))">{{i}}</button>
+		</div>
 	</div>
 </template>
 
 <script setup lang = 'ts'>
 	import { emit } from 'process';
-	import { ref } from 'vue';
+	import { computed, reactive, ref } from 'vue';
 	import Global from '../common-js/Global';
 	class rand {
 		public seed;
@@ -26,14 +48,21 @@
     constructor() {
       this.seed =Date.now() % 999999999;
       this.be = 0;
-    }
-
-    // 取一个随机整数 max=最大值（0开始，不超过该值） 默认10
-    next(max: number) {
+		}
+		//生成 0<= x <max
+    public next(max: number) {
       max = max || 0;
-      this.seed = (this.seed * 9301 + 49297) % 233280;
+      this.seed = (this.seed * 9301 + 49297 + Date.now() % 999999999) % 233280;
       let val = this.seed / 233280.0;
-      return Number((val * max).toFixed(this.be));
+			let tmpRet = Math.ceil(Number(val * max) - 1);
+      return tmpRet;
+    }
+		//生成 min<= x <max
+		public next(min: number, max: number) {
+      max = max  || 0;
+      this.seed = (this.seed * 9301 + 49297 + Date.now() % 999999999) % 233280;
+      let val = this.seed / 233280.0;
+      return Math.ceil(Number(val * (max - min )) + min - 1);
     }
   }
 
@@ -45,9 +74,9 @@
 	let plainKeyName = Global.PlainKeyName;
 	let isStarted = ref(false);
 	let elapsedTime = ref(0);
-	let passNext = ref(true);
-
-	let toVolumn = ref(100);
+	let passNext = ref(false);
+	let validNoteIndex: number[]= []
+	let range: number[] = reactive([3,3])
 	let currentNoteInfo = {
 		ansIndex:0,
 		absNoteIndex: 0,
@@ -62,42 +91,98 @@
 	function hearAgain(){
 		if(isStarted.value){
 			console.log(flatNoteAllKey[currentNoteInfo.ansIndex]);
-			console.log(currentNoteInfo.absNoteIndex,currentNoteInfo.ansIndex);
+			console.log("absIndex " + currentNoteInfo.absNoteIndex,"index "+currentNoteInfo.ansIndex);
 			emits('wantPlay', flatNoteAllKey[currentNoteInfo.ansIndex])
 		}
 	}
+	function genNextVoice(){
+		validNoteIndex.splice(0, validNoteIndex.length)
+		keyNoteOptionStatus.forEach((value, index) =>{
+			if(value === 0){
+				validNoteIndex.push(index)
+			}
+		})
+		
+		let a = random.next(validNoteIndex.length);
+		let b = 12 * (random.next(range[0], range[1] + 1) - 1)
+		console.log("ab", a,b);
+		let nextAbsIndex = validNoteIndex[a] +b
+		currentNoteInfo.ansIndex = nextAbsIndex ;
+		currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
+		// currentNoteInfo.ansIndex = random.next(35) + 12 ;
+		// currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
+		emits('wantPlay', flatNoteAllKey[currentNoteInfo.ansIndex])
+	}
 	function nextNote(){
 		passNext.value = false;
+		keyNoteStatus.forEach((v, index)=>{
+			keyNoteStatus[index] = 0
+		})
+		genNextVoice()
 	}
 	const emits = defineEmits(['wantPlay'])
 	function startNewTest(){
 		if(isStarted.value){
 			elapsedTime.value=0
 		}else{
-			currentNoteInfo.ansIndex = random.next(35) + 12 ;
-			currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
-			emits('wantPlay', flatNoteAllKey[currentNoteInfo.ansIndex])
+			genNextVoice()
 		}
 		isStarted.value=!isStarted.value;
 	}
-	function keyNoteClick(e: number){
-		console.log(e);
-		if(isStarted.value){
-			if(e === currentNoteInfo.absNoteIndex){
-				console.log("yes");
-				completed.value += 1;
-				currentNoteInfo.ansIndex = random.next(35) + 12 ;
-				currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
-				emits('wantPlay', flatNoteAllKey[currentNoteInfo.ansIndex])
-			}else{
-				errorCnt.value += 1;
-			}
-			ScorePercent.value = completed.value / (completed.value + errorCnt.value) * 100
+	let keyNoteStatus = reactive([0,0,0,0,0,0,0,0,0,0,0,0])
+	let keyNoteOptionStatus = reactive([0,0,0,0,0,0,0,0,0,0,0,0])
+	
+	let keyNoteStatusCss = [
+		{
+			backgroundColor: 'rgb(40, 130, 207)',
+			color: 'aliceblue'
+		},
+		{
+			backgroundColor: 'green',
+			color: 'aliceblue'
+		},
+		{
+			backgroundColor: 'red',
+			color: 'aliceblue'
+		},
+		{
+			backgroundColor: 'grey',
+			color: 'aliceblue'
+		},
+	];
+	let keyNoteCssFunc = function(index: number) {
+		if(index >= 100){
+			//Option
+			return keyNoteStatusCss[keyNoteOptionStatus[index - 100]] ;
+		}
+		return keyNoteStatusCss[keyNoteStatus[index]] ;
+	}
+	function keyNoteOptionClick(index: number){
+		if(keyNoteOptionStatus[index] === 3){
+			keyNoteOptionStatus[index] = 0
+		}else{
+			keyNoteOptionStatus[index] = 3;
 		}
 	}
+	function keyNoteClick(absIndex: number){
+		console.log(absIndex);
+		let index = absIndex - 1;
+		if(isStarted.value){
+			if(absIndex === currentNoteInfo.absNoteIndex){
+				keyNoteStatus[index] = 1
+				completed.value += 1;
+				passNext.value = true
+			}else{
+				keyNoteStatus[index] = 2
+				errorCnt.value += 1;
+			}
+			ScorePercent.value = Math.ceil(completed.value / (completed.value + errorCnt.value) * 100)
+		}
+	}
+	let bcss = 'red';
 </script>
-
 <style lang="less">
+	
 	.next{
 		background-color: rgb(117, 248, 139) !important ;
 		color: white !important;
@@ -114,11 +199,12 @@
 	}
 	.statistic-container{
 		display: flex;
-		width:80%;
+		width:450px;
 		justify-content: space-evenly;
 		align-items: center;
 		align-content: space-around;
 		flex-flow: row ;
+		margin:auto;
 		.statistic-panel{
 			background-color: #5bc0de;
 			color: aliceblue;
@@ -130,6 +216,7 @@
 		}
 	}
 	.key-note-container{
+		margin:auto;
 		display: flex;
 		width: 275px;
 		height: 140px;
@@ -137,8 +224,5 @@
 		flex-flow: row wrap;
 		align-items: center;
 		align-content: space-around;
-		.key-note{
-
-		}
 	}
 </style>

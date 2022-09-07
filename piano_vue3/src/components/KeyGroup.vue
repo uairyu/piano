@@ -63,7 +63,6 @@ export default {
     let blackPos = [13, 43, 82, 111, 140];
     let iterWhite = 0, iterBlack = 0;
     function processWhiteEl(el: HTMLElement) {
-      if(!el) return;
       if(el && el.id === ""){
         el.id = iterWhite + '';
         iterWhite++;
@@ -77,7 +76,9 @@ export default {
     }
     
     function processBlackEl(el: HTMLElement) {
-      if(!el) return;
+      if(!el){
+        return
+      };
       if (el && el.id === "") {
         el.id = iterBlack + '';
         iterBlack++;
