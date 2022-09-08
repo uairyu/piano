@@ -4,17 +4,18 @@
 		<span class='statistic-panel'>错误: {{errorCnt}}</span>
 		<span class='statistic-panel'>Score: {{ScorePercent}} %</span>
 		<span class='statistic-panel'>时间: {{elapsedTime}} sec</span>
-		<span class='statistic-panel'>Avg time: {{completed}} sec</span>
-	</div>
-	<button @click="hearAgain" class="control-item" v-show="isStarted">Hear Again</button>
-	<button v-show="passNext && isStarted" @click="nextNote" class="next control-item ">Hear Next</button>
-	<div class="key-note-container">
-		<button v-show="keyNoteOptionStatus[index] === 0" :style="keyNoteCssFunc(index)" @click="keyNoteClick(index + 1)"
-			v-for="(i,index) in plainKeyName" :key="i" :id="String(index + 1)">{{i}}</button>
+		<span class='statistic-panel'>Avg time: {{avgTime}} sec</span>
+			</div>
+			<button @click="hearAgain" class="control-item" v-show="isStarted">Hear Again</button>
+			<button v-show="passNext && isStarted" @click="nextNote" class="next control-item ">Hear Next</button>
+			<div class="key-note-container">
+				<button v-show="keyNoteOptionStatus[index] === 0" :style="keyNoteCssFunc(index)" @click="keyNoteClick(index + 1)"
+		v-for="(i,index) in plainKeyName" :key="i" :id="String(index + 1)">{{i}}</button>
 	</div>
 	<div class="control-panel">
 		<button class="control-item" v-text="!isStarted? 'Start Quiz': 'Stop Quiz'" @click="startNewTest"></button>
 		<div>
+			<span>from</span>
 			<select v-model.number="range[0]">
 				<option>2</option>
 				<option>3</option>
@@ -22,12 +23,17 @@
 				<option>5</option>
 				<option>6</option>
 			</select>
+			<span>to</span>
 			<select v-model.number="range[1]">
 				<option>2</option>
 				<option>3</option>
 				<option>4</option>
 				<option>5</option>
 				<option>6</option>
+			</select>
+			<span>Speed</span>
+			<select v-model="speed">
+				<option style="width: 30px" v-for="(i, index) in speedList" :key="index">{{i}}</option>
 			</select>
 		</div>
 		<div>
@@ -70,13 +76,13 @@
 	let completed = ref(0);
 	let errorCnt = ref(0);
 	let ScorePercent = computed(()=> Math.ceil(completed.value / (completed.value + errorCnt.value) * 100));
-	let plainKeyName = Global.PlainKeyName;
+	let plainKeyName = Global.IntervalName;
 	let isStarted = ref(false);
 	let elapsedTime = ref(0);
 	let passNext = ref(false);
+	let avgTime = ref(0);
 	let validNoteIndex: number[]= []
 	let range: number[] = reactive([3,3])
-	let avgTime = ref(0)
 	function resetStatistic(){
 		completed.value = 0;
 		errorCnt.value = 0;
@@ -85,6 +91,8 @@
 	let currentNoteInfo = {
 		ansIndex:0,
 		absNoteIndex: 0,
+		interval: 0,
+		octave: 0,
 	}
 	let flatNoteAllKey = Global.KeyNoteFullPath.flat();
 	
@@ -95,11 +103,17 @@
 	},1000)
 	function hearAgain(){
 		if(isStarted.value){
-			console.log(flatNoteAllKey[currentNoteInfo.ansIndex]);
-			console.log("absIndex " + currentNoteInfo.absNoteIndex,"index "+currentNoteInfo.ansIndex);
-			emits('wantPlay', flatNoteAllKey[currentNoteInfo.ansIndex])
+			console.log(flatNoteAllKey[currentNoteInfo.absNoteIndex]);
+			console.log(currentNoteInfo);
+			emits('wantPlay', flatNoteAllKey[currentNoteInfo.absNoteIndex])
+			console.log(Global.IntervalName[currentNoteInfo.ansIndex]);
+			setTimeout(()=>{
+				emits('wantPlay', flatNoteAllKey[currentNoteInfo.absNoteIndex + currentNoteInfo.interval])
+			}, 400 * (speedList.findIndex(x => x === speed.value) + 1))
 		}
 	}
+	let speed = ref("slow")
+	let speedList = ['fast','medium','slow','very slow']
 	function genNextVoice(){
 		validNoteIndex.splice(0, validNoteIndex.length)
 		keyNoteOptionStatus.forEach((value, index) =>{
@@ -107,16 +121,16 @@
 				validNoteIndex.push(index)
 			}
 		})
-		
 		let a = random.next(validNoteIndex.length);
-		let b = 12 * (random.next(range[0], range[1] + 1) - 1)
-		console.log("ab", a,b);
-		let nextAbsIndex = validNoteIndex[a] +b
-		currentNoteInfo.ansIndex = nextAbsIndex ;
-		currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
-		// currentNoteInfo.ansIndex = random.next(35) + 12 ;
-		// currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
-		emits('wantPlay', flatNoteAllKey[currentNoteInfo.ansIndex])
+		let interval = validNoteIndex[a];
+		currentNoteInfo.octave = 12 * (random.next(range[0], range[1] + 1) - 1)
+		let firstNote = random.next(12);
+		let nextAbsIndex = firstNote + currentNoteInfo.octave;
+		currentNoteInfo.ansIndex = interval ;
+		currentNoteInfo.absNoteIndex = nextAbsIndex;
+		currentNoteInfo.interval = interval;
+		hearAgain();
+		
 	}
 	function nextNote(){
 		passNext.value = false;
@@ -128,14 +142,16 @@
 	const emits = defineEmits(['wantPlay'])
 	function startNewTest(){
 		if(isStarted.value){
-			elapsedTime.value=0
+			resetStatistic()
+			
+			isStarted.value=!isStarted.value;
 		}else{
+			isStarted.value=!isStarted.value;
 			genNextVoice()
 		}
-		isStarted.value=!isStarted.value;
 	}
-	let keyNoteStatus = reactive([0,0,0,0,0,0,0,0,0,0,0,0])
-	let keyNoteOptionStatus = reactive([0,0,0,0,0,0,0,0,0,0,0,0])
+	let keyNoteStatus = reactive([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+	let keyNoteOptionStatus = reactive([3,3,3,3,0,3,3,0,3,3,3,3,0,3,3])
 	
 	let keyNoteStatusCss = [
 		{
@@ -173,7 +189,7 @@
 		console.log(absIndex);
 		let index = absIndex - 1;
 		if(isStarted.value){
-			if(absIndex === currentNoteInfo.absNoteIndex){
+			if(index === currentNoteInfo.ansIndex){
 				keyNoteStatus[index] = 1
 				completed.value += 1;
 				avgTime.value = Number((elapsedTime.value / completed.value).toFixed(2))
@@ -221,9 +237,10 @@
 		}
 	}
 	.key-note-container{
+		padding: 10px 0;
 		margin:auto;
 		display: flex;
-		width: 275px;
+		width: 500px;
 		justify-content: space-evenly;
 		flex-flow: row wrap;
 		align-items: center;

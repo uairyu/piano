@@ -1,6 +1,9 @@
 class Global{
 	static readonly KeyNotePath = './note/';
 	static readonly PlainKeyName = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
+	static readonly IntervalName = ['Perfect Unison','Minor 2nd', 'Major 2nd','Minor 3rd','Major 3rd',
+		'Perfect 4th','Tritone', 'Perfect 5th','Minor 6th','Major 6th','Minor 7th', 'Major 7th','Perfect Octave'
+		,'Minor 9th','Major 9th']
 	static readonly KeyNoteMap = [
 		['C1','D1b','D1','E1b','E1','F1','G1b','G1','A1b','A1','B1b','B1'],
 		['C2','D2b','D2','E2b','E2','F2','G2b','G2','A2b','A2','B2b','B2'],

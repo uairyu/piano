@@ -38,10 +38,10 @@ export default {
 
 <style lang="less">
 .scroll-width {
-	@parent-width: 300px;
+	@parent-width: 150px;
 	overflow: auto;
 	width: @parent-width;
-	
+	padding-top: 5px;
 	.child-width {
 		height: 1px;
 		width: @parent-width * 10;

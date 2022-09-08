@@ -3,7 +3,7 @@
   import ScrollBar from './components/scrollBar.vue';
   import PerfectPitch from './components/PerfectPitch.vue'
   import KeyGroup from './components/KeyGroup.vue';
-  import { emit } from 'process';
+  import Interval from '@/components/Interval.vue';
   let kk = ref();
   let volume = ref(100);
   const keyGroup = ref()
@@ -14,13 +14,26 @@
     keyGroup.value.controlPlay(noteFullPath);
     
   }
+  let tabComp = ref()
+  
+  let tabNameClick = function(o: any){
+    tabComp.value = o
+  }
 </script>
  
 <template>
   <KeyGroup :controlVolume="volume" ref="keyGroup"></KeyGroup>
+  <br/>
   <ScrollBar :initRate="4" :maxRate="4" v-slot="kk" @valueChanged="getRate"></ScrollBar>
   <p>volume{{volume}}</p>
-  <PerfectPitch @wantPlay="wantPlay"></PerfectPitch>
+  <div>
+    <button @click="tabNameClick(PerfectPitch)" id="PerfectPitch">Perfect Pitch</button>
+    <button @click="tabNameClick(Interval)" id="PerfectPitch">Interval</button>
+    <component :is="tabComp" @wantPlay = "wantPlay">
+    </component>
+  </div>
+  <!-- <PerfectPitch @wantPlay="wantPlay"></PerfectPitch> -->
+  <!-- <Interval @wantPlay="wantPlay"></Interval> -->
 </template>
 
 <style lang='less'>
