@@ -54,20 +54,15 @@
       this.seed =Date.now() % 999999999;
       this.be = 0;
 		}
-		//生成 0<= x <max
-    public next(max: number) {
-      max = max || 0;
-      this.seed = (this.seed * 9301 + 49297 + Date.now() % 999999999) % 233280;
-      let val = this.seed / 233280.0;
-			let tmpRet = Math.ceil(Number(val * max) - 1);
-      return tmpRet;
-    }
 		//生成 min<= x <max
-		public next(min: number, max: number) {
-      max = max  || 0;
+		public next(min: number, max?: number):number {
+			if(max === undefined){
+				max = min;
+				min = 0;
+			}
       this.seed = (this.seed * 9301 + 49297 + Date.now() % 999999999) % 233280;
       let val = this.seed / 233280.0;
-      return Math.ceil(Number(val * (max - min )) + min - 1);
+			return Math.ceil(Number(val * (max - min )) + min - 1);
     }
   }
 
@@ -94,7 +89,7 @@
 		interval: 0,
 		octave: 0,
 	}
-	let flatNoteAllKey = Global.KeyNoteFullPath.flat();
+	let flatNoteAllKey = Global.KeyNoteFullPath().flat();
 	
 	setInterval(()=>{
 		if(isStarted.value){

@@ -1,5 +1,7 @@
+import { ref } from "vue";
+
 class Global{
-	static readonly KeyNotePath = './note1/';
+	static KeyNotePath = ref('./note1/');
 	static readonly PlainKeyName = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
 	static readonly IntervalName = ['Perfect Unison','Minor 2nd', 'Major 2nd','Minor 3rd','Major 3rd',
 		'Perfect 4th','Tritone', 'Perfect 5th','Minor 6th','Major 6th','Minor 7th', 'Major 7th','Perfect Octave'
@@ -21,15 +23,19 @@ class Global{
 		})
 		return trueMap;
 	}()
-	static KeyNoteFullPath: string[][] = function(){
+	static KeyNoteFullPath = function() : string[][]{
 		let trueMap:any = [];
 		Global.KeyNoteMap.map((tmpArray) =>{
 			let tmpk:any = [];
-			tmpArray.forEach(x=> tmpk.push(Global.KeyNotePath + x + ".ogg"));
+			tmpArray.forEach(x=> tmpk.push(Global.KeyNotePath.value + x + ".ogg"));
 			trueMap.push(tmpk);
 		})
 		return trueMap;
-	}()
+	}
 }
 
 export default Global;
+
+function reactive(arg0: any): string[][] {
+throw new Error("Function not implemented.");
+}

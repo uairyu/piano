@@ -48,14 +48,6 @@
       this.seed =Date.now() % 999999999;
       this.be = 0;
 		}
-		//生成 0<= x <max
-    public next(max: number) {
-      max = max || 0;
-      this.seed = (this.seed * 9301 + 49297 + Date.now() % 999999999) % 233280;
-      let val = this.seed / 233280.0;
-			let tmpRet = Math.ceil(Number(val * max) - 1);
-      return tmpRet;
-    }
 		//生成 min<= x <max
 		public next(min: number, max?: number):number {
 			if(max === undefined){
@@ -89,7 +81,7 @@
 		ansIndex:0,
 		absNoteIndex: 0,
 	}
-	let flatNoteAllKey = Global.KeyNoteFullPath.flat();
+	let flatNoteAllKey = reactive(Global.KeyNoteFullPath().flat());
 	
 	setInterval(()=>{
 		if(isStarted.value){

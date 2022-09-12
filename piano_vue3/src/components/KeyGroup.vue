@@ -61,6 +61,8 @@ export default {
     const notePath = ref(Global.KeyNotePath);
     function changeStyle(path: string){
       notePath.value = path;
+      map = {}
+      Global.KeyNotePath.value = path;
     }
     function controlPlay(fullPath: string){
       play(map[fullPath])
