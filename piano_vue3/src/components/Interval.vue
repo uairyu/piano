@@ -163,7 +163,7 @@
 			color: 'aliceblue'
 		},
 		{
-			backgroundColor: 'red',
+			backgroundColor: '#e92a34',
 			color: 'aliceblue'
 		},
 		{
@@ -195,8 +195,10 @@
 				avgTime.value = Number((elapsedTime.value / completed.value).toFixed(2))
 				passNext.value = true
 			}else{
-				keyNoteStatus[index] = 2
-				errorCnt.value += 1;
+				if(keyNoteStatus[index] !== 2 && passNext.value !== true){
+					keyNoteStatus[index] = 2
+					errorCnt.value += 1;
+				}
 			}
 		}
 	}

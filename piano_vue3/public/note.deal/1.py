@@ -8,6 +8,7 @@ for fname in os.listdir("./"):
 		rawfilename = fname
 		for (k,v) in m.items():
 			if k in fname:
+
 				fname = fname.replace(k,v)
 				fname = fname.replace('#','b')
 				print("org: %s to: %s"%(rawfilename, fname))

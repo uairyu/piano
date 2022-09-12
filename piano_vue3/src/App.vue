@@ -24,7 +24,7 @@
 <template>
   <KeyGroup :controlVolume="volume" ref="keyGroup"></KeyGroup>
   <br/>
-  <ScrollBar :initRate="4" :maxRate="4" v-slot="kk" @valueChanged="getRate"></ScrollBar>
+  <ScrollBar :initRate="1.5" :maxRate="4" v-slot="kk" @valueChanged="getRate"></ScrollBar>
   <p>volume{{volume}}</p>
   <div>
     <button @click="tabNameClick(PerfectPitch)" id="PerfectPitch">Perfect Pitch</button>

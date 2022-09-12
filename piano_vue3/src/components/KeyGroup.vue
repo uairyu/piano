@@ -1,4 +1,6 @@
 <template>
+  <button @click="changeStyle('./note/')">style1</button>
+  <button @click="changeStyle('./note1/')">style2</button>
   <div class="key-container1">
     <div style="position: relative" v-for="i in 5">
       <div v-for="(item, index) in 2" :style="{ left: blackPos[index] + 'px' }" class='white-key'
@@ -14,6 +16,7 @@
 </template>
 
 <script lang="ts">
+import Global from "@/common-js/Global.ts";
 import { nextTick, onMounted, ref,defineExpose } from "vue";
 export default {
   props:{
@@ -55,8 +58,10 @@ export default {
       gainNode.connect(audioCtx.destination);
       bufferNode.start(0, 0);
     }
-    const notePath = "./note/";
-
+    const notePath = ref(Global.KeyNotePath);
+    function changeStyle(path: string){
+      notePath.value = path;
+    }
     function controlPlay(fullPath: string){
       play(map[fullPath])
     }
@@ -67,7 +72,7 @@ export default {
         el.id = iterWhite + '';
         iterWhite++;
       }
-      const newLocal = notePath + keyMapWhite[Number(el.id)];
+      const newLocal = notePath.value + keyMapWhite[Number(el.id)];
       // console.log(newLocal);
       getData(newLocal);
       el.onclick = (ev) =>{
@@ -83,7 +88,7 @@ export default {
         el.id = iterBlack + '';
         iterBlack++;
       }
-      const newLocal = notePath + keyMapBlack[Number(el.id)];
+      const newLocal = notePath.value + keyMapBlack[Number(el.id)];
       // console.log(newLocal);
       getData(newLocal);
       el.onclick = (ev) => {
@@ -91,7 +96,7 @@ export default {
       }
     }
 
-    return { processWhiteEl, processBlackEl, blackPos, controlPlay };
+    return { changeStyle, processWhiteEl, processBlackEl, blackPos, controlPlay };
   },
 };
 </script>
