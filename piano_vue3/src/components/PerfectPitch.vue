@@ -57,11 +57,14 @@
       return tmpRet;
     }
 		//生成 min<= x <max
-		public next(min: number, max: number) {
-      max = max  || 0;
+		public next(min: number, max?: number):number {
+			if(max === undefined){
+				max = min;
+				min = 0;
+			}
       this.seed = (this.seed * 9301 + 49297 + Date.now() % 999999999) % 233280;
       let val = this.seed / 233280.0;
-      return Math.ceil(Number(val * (max - min )) + min - 1);
+			return Math.ceil(Number(val * (max - min )) + min - 1);
     }
   }
 
