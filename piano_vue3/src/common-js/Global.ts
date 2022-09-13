@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 class Global{
 	static KeyNotePath = ref('./note1/');
@@ -14,7 +14,7 @@ class Global{
 		['C5','D5b','D5','E5b','E5','F5','G5b','G5','A5b','A5','B5b','B5'],
 		['C6','D6b','D6','E6b','E6','F6','G6b','G6','A6b','A6','B6b','B6'],
 	];
-	static KeyNoteNameMap: string[][] = function(){
+	static readonly KeyNoteNameMap: string[][] = function(){
 		let trueMap:any = [];
 		Global.KeyNoteMap.map((tmpArray) =>{
 			let tmpk:any = [];
@@ -23,19 +23,16 @@ class Global{
 		})
 		return trueMap;
 	}()
-	static KeyNoteFullPath = function() : string[][]{
+	static readonly KeyNoteFullPath = computed(()=>{
 		let trueMap:any = [];
-		Global.KeyNoteMap.map((tmpArray) =>{
+		Global.KeyNoteNameMap.map((tmpArray) =>{
 			let tmpk:any = [];
-			tmpArray.forEach(x=> tmpk.push(Global.KeyNotePath.value + x + ".ogg"));
+			tmpArray.forEach(x=> tmpk.push(Global.KeyNotePath.value + x));
 			trueMap.push(tmpk);
 		})
 		return trueMap;
-	}
+	}) 
 }
 
 export default Global;
 
-function reactive(arg0: any): string[][] {
-throw new Error("Function not implemented.");
-}

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import {onMounted, ref, reactive} from 'vue';
+  import {onMounted, ref, reactive, markRaw, shallowRef} from 'vue';
   import ScrollBar from './components/scrollBar.vue';
   import PerfectPitch from './components/PerfectPitch.vue'
   import KeyGroup from './components/KeyGroup.vue';
@@ -14,7 +14,7 @@
     keyGroup.value.controlPlay(noteFullPath);
     
   }
-  let tabComp = ref()
+  let tabComp = shallowRef(null);
   
   let tabNameClick = function(o: any){
     tabComp.value = o
@@ -29,15 +29,11 @@
   <div>
     <button @click="tabNameClick(PerfectPitch)" id="PerfectPitch">Perfect Pitch</button>
     <button @click="tabNameClick(Interval)" id="PerfectPitch">Interval</button>
-    <component :is="tabComp" @wantPlay = "wantPlay">
-    </component>
+    <component :is="tabComp" @wantPlay = "wantPlay"></component>
   </div>
   <!-- <PerfectPitch @wantPlay="wantPlay"></PerfectPitch> -->
   <!-- <Interval @wantPlay="wantPlay"></Interval> -->
 </template>
 
 <style lang='less'>
-  .asda{
-
-  }
 </style>

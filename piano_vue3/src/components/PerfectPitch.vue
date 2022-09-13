@@ -81,7 +81,8 @@
 		ansIndex:0,
 		absNoteIndex: 0,
 	}
-	let flatNoteAllKey = reactive(Global.KeyNoteFullPath().flat());
+	
+	let flatNoteAllKey = computed(()=> Global.KeyNoteFullPath.value.flat());
 	
 	setInterval(()=>{
 		if(isStarted.value){
@@ -90,9 +91,9 @@
 	},1000)
 	function hearAgain(){
 		if(isStarted.value){
-			console.log(flatNoteAllKey[currentNoteInfo.ansIndex]);
+			console.log(flatNoteAllKey.value[currentNoteInfo.ansIndex]);
 			console.log("absIndex " + currentNoteInfo.absNoteIndex,"index "+currentNoteInfo.ansIndex);
-			emits('wantPlay', flatNoteAllKey[currentNoteInfo.ansIndex])
+			emits('wantPlay', flatNoteAllKey.value[currentNoteInfo.ansIndex])
 		}
 	}
 	function genNextVoice(){
@@ -111,7 +112,7 @@
 		currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
 		// currentNoteInfo.ansIndex = random.next(35) + 12 ;
 		// currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
-		emits('wantPlay', flatNoteAllKey[currentNoteInfo.ansIndex])
+		emits('wantPlay', flatNoteAllKey.value[currentNoteInfo.ansIndex])
 	}
 	function nextNote(){
 		passNext.value = false;

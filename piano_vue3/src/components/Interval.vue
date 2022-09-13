@@ -89,7 +89,7 @@
 		interval: 0,
 		octave: 0,
 	}
-	let flatNoteAllKey = Global.KeyNoteFullPath().flat();
+	let flatNoteAllKey = computed(()=> Global.KeyNoteFullPath.value.flat());
 	
 	setInterval(()=>{
 		if(isStarted.value){
@@ -98,12 +98,12 @@
 	},1000)
 	function hearAgain(){
 		if(isStarted.value){
-			console.log(flatNoteAllKey[currentNoteInfo.absNoteIndex]);
+			console.log(flatNoteAllKey.value[currentNoteInfo.absNoteIndex]);
 			console.log(currentNoteInfo);
-			emits('wantPlay', flatNoteAllKey[currentNoteInfo.absNoteIndex])
+			emits('wantPlay', flatNoteAllKey.value[currentNoteInfo.absNoteIndex])
 			console.log(Global.IntervalName[currentNoteInfo.ansIndex]);
 			setTimeout(()=>{
-				emits('wantPlay', flatNoteAllKey[currentNoteInfo.absNoteIndex + currentNoteInfo.interval])
+				emits('wantPlay', flatNoteAllKey.value[currentNoteInfo.absNoteIndex + currentNoteInfo.interval])
 			}, 400 * (speedList.findIndex(x => x === speed.value) + 1))
 		}
 	}

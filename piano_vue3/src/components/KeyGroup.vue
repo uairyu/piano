@@ -1,10 +1,9 @@
 <template>
-  <button @click="changeStyle('./note/')">style1</button>
-  <button @click="changeStyle('./note1/')">style2</button>
+  <button @click="changeStyle('./note/', 0)" :style="styleList[activeStyleIndex[0]]">style1</button>
+  <button @click="changeStyle('./note1/', 1)" :style="styleList[activeStyleIndex[1]]">style2</button>
   <div class="key-container1">
     <div style="position: relative" v-for="i in 5">
-      <div v-for="(item, index) in 2" :style="{ left: blackPos[index] + 'px' }" class='white-key'
-        :ref="processBlackEl">
+      <div v-for="(item, index) in 2" :style="{ left: blackPos[index] + 'px' }" class='white-key' :ref="processBlackEl">
       </div>
       <div v-for='(item, index) in 3' class='black-key' :ref="processWhiteEl"></div>
       <div v-for="(item, index) in 3" :style="{ left: blackPos[index + 2] + 'px' }" class='white-key'
@@ -16,8 +15,8 @@
 </template>
 
 <script lang="ts">
-import Global from "@/common-js/Global.ts";
-import { nextTick, onMounted, ref,defineExpose } from "vue";
+import Global from "@/common-js/Global";
+import { computed, reactive, ref } from "vue";
 export default {
   props:{
     controlVolume:{type: Number, required: true}
@@ -58,11 +57,13 @@ export default {
       gainNode.connect(audioCtx.destination);
       bufferNode.start(0, 0);
     }
-    const notePath = ref(Global.KeyNotePath);
-    function changeStyle(path: string){
-      notePath.value = path;
-      map = {}
-      Global.KeyNotePath.value = path;
+    const notePath = computed(()=>Global.KeyNotePath.value);
+    function changeStyle(path: string, index: number){
+      if(activeStyleIndex[index] !== 1){
+        Global.KeyNotePath.value = path;
+        activeStyleIndex[index] ^= 1;
+        activeStyleIndex[index ^ 1] ^= 1;
+      }
     }
     function controlPlay(fullPath: string){
       play(map[fullPath])
@@ -70,15 +71,18 @@ export default {
     let blackPos = [13, 43, 82, 111, 140];
     let iterWhite = 0, iterBlack = 0;
     function processWhiteEl(el: HTMLElement) {
+      if(!el){
+        return
+      };
       if(el && el.id === ""){
         el.id = iterWhite + '';
         iterWhite++;
       }
-      const newLocal = notePath.value + keyMapWhite[Number(el.id)];
       // console.log(newLocal);
+      const newLocal = notePath.value + keyMapWhite[Number(el.id)];
       getData(newLocal);
-      el.onclick = (ev) =>{
-        play(map[newLocal]);
+      el.onclick = el.onclick? el.onclick: (ev) =>{
+        play(map[notePath.value + keyMapWhite[Number(el.id)]]);
       }
     }
     
@@ -97,8 +101,18 @@ export default {
         play(map[newLocal]);
       }
     }
-
-    return { changeStyle, processWhiteEl, processBlackEl, blackPos, controlPlay };
+    let styleList = [
+      {
+        backgroundColor: 'grey',
+        color: 'aliceblue'
+      },
+      {
+        backgroundColor: 'green',
+        color: 'aliceblue'
+      },
+    ]
+    let activeStyleIndex = reactive([0,1]);
+    return {styleList, activeStyleIndex, changeStyle, processWhiteEl, processBlackEl, blackPos, controlPlay };
   },
 };
 </script>

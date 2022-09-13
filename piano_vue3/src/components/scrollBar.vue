@@ -23,9 +23,9 @@ export default {
 			let scrollEl: HTMLElement = scroll.value;
 			
 			// console.log(scrollEl.offsetWidth);
-			console.log(scrollEl.scrollWidth);
+			// console.log(scrollEl.scrollWidth);
 			scrollEl.scrollLeft = initRate / maxRate * scrollEl.scrollWidth;
-			console.log(scrollEl.scrollLeft);
+			// console.log(scrollEl.scrollLeft);
 			function f(){
 				scrollBarValue.value =  scrollEl.scrollLeft;
 				emit('valueChanged', scrollBarValue.value / (scrollEl.scrollWidth - scrollEl.offsetWidth) * maxRate / 100);
@@ -34,7 +34,6 @@ export default {
 			scroll.value.addEventListener('scroll', (e: Event) => {
 				f()
 			})
-
 		})
 
 		return { props, scroll, scrollBarValue, maxRate };
