@@ -217,7 +217,7 @@
 	}
 	.statistic-container{
 		display: flex;
-		width:450px;
+		max-width:450px;
 		justify-content: space-evenly;
 		align-items: center;
 		align-content: space-around;
@@ -237,7 +237,7 @@
 		padding: 10px 0;
 		margin:auto;
 		display: flex;
-		width: 500px;
+		width: 275px;
 		justify-content: space-evenly;
 		flex-flow: row wrap;
 		align-items: center;

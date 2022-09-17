@@ -4,7 +4,7 @@
 		<span class='statistic-panel'>错误: {{errorCnt}}</span>
 		<span class='statistic-panel'>Score: {{ScorePercent}} %</span>
 		<span class='statistic-panel'>时间: {{elapsedTime}} sec</span>
-		<span class='statistic-panel'>Avg time: {{completed}} sec</span>
+		<span class='statistic-panel'>Avg time: {{avgTime}} sec</span>
 	</div>
 	<button @click="hearAgain" class="control-item" v-show="isStarted">Hear Again</button>
 	<button v-show="passNext && isStarted" @click="nextNote" class="next control-item ">Hear Next</button>
@@ -32,6 +32,9 @@
 		</div>
 		<div>
 			<span style=" display: block">Option</span>
+			<span style="display: block">
+				<input type="checkbox" v-model="autoNext">autoNext
+			</span>
 			<button :style="keyNoteCssFunc(index + 100)" @click="keyNoteOptionClick(index)" v-for="(i,index) in plainKeyName"
 				:key="i" :id="String('open' + (index + 1))">{{i}}</button>
 		</div>
@@ -72,10 +75,12 @@
 	let validNoteIndex: number[]= []
 	let range: number[] = reactive([3,3])
 	let avgTime = ref(0)
+	let autoNext = ref(false)
 	function resetStatistic(){
 		completed.value = 0;
 		errorCnt.value = 0;
 		elapsedTime.value = 0;
+
 	}
 	let currentNoteInfo = {
 		ansIndex:0,
@@ -124,7 +129,7 @@
 	const emits = defineEmits(['wantPlay'])
 	function startNewTest(){
 		if(isStarted.value){
-			elapsedTime.value=0
+			resetStatistic()
 		}else{
 			genNextVoice()
 		}
@@ -174,6 +179,9 @@
 				completed.value += 1;
 				avgTime.value = Number((elapsedTime.value / completed.value).toFixed(2))
 				passNext.value = true
+				if(autoNext.value){
+					nextNote()
+				}
 			}else{
 				if(keyNoteStatus[index] !== 2 && passNext.value !== true){
 					keyNoteStatus[index] = 2
@@ -202,7 +210,7 @@
 	}
 	.statistic-container{
 		display: flex;
-		width:450px;
+		max-width: 450px;
 		justify-content: space-evenly;
 		align-items: center;
 		align-content: space-around;
