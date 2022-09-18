@@ -48,6 +48,7 @@ export default {
 	width: @parent-width;
 	padding-top: 5px;
 	.child-width {
+		// add some tags
 		// height: 1px;
 		width: @parent-width * 10;
 	}
