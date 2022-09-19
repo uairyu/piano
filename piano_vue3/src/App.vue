@@ -9,18 +9,18 @@
   const keyGroup = ref()
   function getRate(newValue: number): void{
     volume.value = Number((newValue*100 + '').substring(0,5));
-  } 
+  }
   function wantPlay(noteFullPath:string){
     keyGroup.value.controlPlay(noteFullPath);
-    
+
   }
   let tabComp = shallowRef(null);
-  
+
   let tabNameClick = function(o: any){
     tabComp.value = o
   }
 </script>
- 
+
 <template>
   <KeyGroup :controlVolume="volume" ref="keyGroup"></KeyGroup>
   <br/>

@@ -6,6 +6,7 @@
 		<span class='statistic-panel'>时间: {{elapsedTime}} sec</span>
 		<span class='statistic-panel'>Avg time: {{avgTime}} sec</span>
 	</div>
+		<br/>
 	<button @click="hearAgain" class="control-item" v-show="isStarted">Hear Again</button>
 	<button v-show="passNext && isStarted" @click="nextNote" class="next control-item ">Hear Next</button>
 	<div class="key-note-container">
@@ -13,7 +14,7 @@
 			v-for="(i,index) in plainKeyName" :key="i" :id="String(index + 1)">{{i}}</button>
 	</div>
 	<div class="control-panel">
-		<button class="control-item" v-text="!isStarted? 'Start Quiz': 'Stop Quiz'" @click="startNewTest"></button>
+		<button style= "margin-top: 45px" class="control-item" v-text="!isStarted? 'Start Quiz': 'Stop Quiz'" @click="startNewTest"></button>
 		<div>
 			<select v-model.number="range[0]">
 				<option>2</option>
@@ -86,9 +87,9 @@
 		ansIndex:0,
 		absNoteIndex: 0,
 	}
-	
+
 	let flatNoteAllKey = computed(()=> Global.KeyNoteFullPath.value.flat());
-	
+
 	setInterval(()=>{
 		if(isStarted.value){
 			elapsedTime.value += 1
@@ -108,7 +109,7 @@
 				validNoteIndex.push(index)
 			}
 		})
-		
+
 		let a = random.next(validNoteIndex.length);
 		let b = 12 * (random.next(range[0], range[1] + 1) - 1)
 		console.log("ab", a,b);
@@ -137,7 +138,7 @@
 	}
 	let keyNoteStatus = reactive([0,0,0,0,0,0,0,0,0,0,0,0])
 	let keyNoteOptionStatus = reactive([0,0,0,0,0,0,0,0,0,0,0,0])
-	
+
 	let keyNoteStatusCss = [
 		{
 			backgroundColor: 'rgb(40, 130, 207)',
@@ -193,7 +194,7 @@
 	let bcss = 'red';
 </script>
 <style lang="less" scoped>
-	
+
 	.next{
 		background-color: rgb(117, 248, 139) !important ;
 		color: white !important;
