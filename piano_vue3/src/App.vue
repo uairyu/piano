@@ -19,10 +19,15 @@
   let tabNameClick = function(o: any){
     tabComp.value = o
   }
+  let isHideKeyboard = ref(false)
+  function hideKeyboard(){
+    isHideKeyboard.value = isHideKeyboard.value == true? false: true;
+  }
 </script>
 
 <template>
-  <KeyGroup :controlVolume="volume" ref="keyGroup"></KeyGroup>
+  <button @click="hideKeyboard">Hide Keyboard</button>
+  <KeyGroup v-show="isHideKeyboard" :controlVolume="volume" ref="keyGroup"></KeyGroup>
   <br/>
   <ScrollBar :initRate="1.5" :maxRate="4" v-slot="kk" @valueChanged="getRate"></ScrollBar>
   <p>volume{{volume}}</p>

@@ -1,15 +1,17 @@
 <template>
-  <button @click="changeStyle('./note/', 0)" :style="styleList[activeStyleIndex[0]]">style1</button>
-  <button @click="changeStyle('./note1/', 1)" :style="styleList[activeStyleIndex[1]]">style2</button>
-  <div class="key-container1">
-    <div style="position: relative" v-for="i in 5">
-      <div v-for="(item, index) in 2" :style="{ left: blackPos[index] + 'px' }" class='white-key' :ref="processBlackEl">
+  <div>
+    <button @click="changeStyle('./note/', 0)" :style="styleList[activeStyleIndex[0]]">style1</button>
+    <button @click="changeStyle('./note1/', 1)" :style="styleList[activeStyleIndex[1]]">style2</button>
+    <div class="key-container1">
+      <div style="position: relative" v-for="i in 5">
+        <div v-for="(item, index) in 2" :style="{ left: blackPos[index] + 'px' }" class='white-key' :ref="processBlackEl">
+        </div>
+        <div v-for='(item, index) in 3' class='black-key' :ref="processWhiteEl"></div>
+        <div v-for="(item, index) in 3" :style="{ left: blackPos[index + 2] + 'px' }" class='white-key'
+          :ref="processBlackEl">
+        </div>
+        <div v-for='(item, index) in 4' class='black-key' :ref="processWhiteEl"></div>
       </div>
-      <div v-for='(item, index) in 3' class='black-key' :ref="processWhiteEl"></div>
-      <div v-for="(item, index) in 3" :style="{ left: blackPos[index + 2] + 'px' }" class='white-key'
-        :ref="processBlackEl">
-      </div>
-      <div v-for='(item, index) in 4' class='black-key' :ref="processWhiteEl"></div>
     </div>
   </div>
 </template>
@@ -24,7 +26,7 @@ export default {
   name: "KeyGroup",
   setup(props: any , { emit }: any) {
     let keyMapWhite = [
-      'C2.ogg', 'D2.ogg', 'E2.ogg', 'F2.ogg', 'G2.ogg', 'A2.ogg', 'B2.ogg', 'C3.ogg', 'D3.ogg', 'E3.ogg', 'F3.ogg', 'G3.ogg', 'A3.ogg', 'B3.ogg', 'C4.ogg', 'D4.ogg', 'E4.ogg', 'F4.ogg', 'G4.ogg', 'A4.ogg', 'B4.ogg', 'C5.ogg', 'D5.ogg', 'E5.ogg', 'F5.ogg', 'G5.ogg', 'A5.ogg', 'B5.ogg', 'C6.ogg', 'D6.ogg', 'E6.ogg', 'F6.ogg', 'G6.ogg', 'A6.ogg', 'B6.ogg', 'C7.ogg', 
+      'C2.ogg', 'D2.ogg', 'E2.ogg', 'F2.ogg', 'G2.ogg', 'A2.ogg', 'B2.ogg', 'C3.ogg', 'D3.ogg', 'E3.ogg', 'F3.ogg', 'G3.ogg', 'A3.ogg', 'B3.ogg', 'C4.ogg', 'D4.ogg', 'E4.ogg', 'F4.ogg', 'G4.ogg', 'A4.ogg', 'B4.ogg', 'C5.ogg', 'D5.ogg', 'E5.ogg', 'F5.ogg', 'G5.ogg', 'A5.ogg', 'B5.ogg', 'C6.ogg', 'D6.ogg', 'E6.ogg', 'F6.ogg', 'G6.ogg', 'A6.ogg', 'B6.ogg', 'C7.ogg',
     ]
     let keyMapBlack = [
       'D2b.ogg', 'E2b.ogg', 'G2b.ogg', 'A2b.ogg', 'B2b.ogg', 'D3b.ogg', 'E3b.ogg', 'G3b.ogg', 'A3b.ogg', 'B3b.ogg', 'D4b.ogg', 'E4b.ogg', 'G4b.ogg', 'A4b.ogg', 'B4b.ogg', 'D5b.ogg', 'E5b.ogg', 'G5b.ogg', 'A5b.ogg', 'B5b.ogg', 'D6b.ogg', 'E6b.ogg', 'G6b.ogg', 'A6b.ogg', 'B6b.ogg',
@@ -33,7 +35,7 @@ export default {
     const maxVolumn = 4
 
     let audioCtx:AudioContext = new AudioContext();
-    
+
     function getData(name: string){
       if(map[name] === undefined){
         fetch(name).then(r=>  {
@@ -85,7 +87,7 @@ export default {
         play(map[notePath.value + keyMapWhite[Number(el.id)]]);
       }
     }
-    
+
     function processBlackEl(el: HTMLElement) {
       if(!el){
         return
