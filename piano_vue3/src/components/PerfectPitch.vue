@@ -16,14 +16,14 @@
 	<div class="control-panel">
 		<button style= "margin-top: 45px" class="control-item" v-text="!isStarted? 'Start Quiz': 'Stop Quiz'" @click="startNewTest"></button>
 		<div>
-			<select v-model.number="range[0]">
+			<select v-model.number="range[0]" @change="rangeChange(0)">
 				<option>2</option>
 				<option>3</option>
 				<option>4</option>
 				<option>5</option>
 				<option>6</option>
 			</select>
-			<select v-model.number="range[1]">
+			<select v-model.number="range[1]" @change="rangeChange(1)">
 				<option>2</option>
 				<option>3</option>
 				<option>4</option>
@@ -76,7 +76,7 @@
 	let validNoteIndex: number[]= []
 	let range: number[] = reactive([3,3])
 	let avgTime = ref(0)
-	let autoNext = ref(false)
+	let autoNext = ref(true)
 	function resetStatistic(){
 		completed.value = 0;
 		errorCnt.value = 0;
@@ -190,6 +190,17 @@
 				}
 			}
 		}
+	}
+
+	function rangeChange(leftOrRight: number){
+		console.log(range[0], range[1], leftOrRight);
+		if(leftOrRight == 0 && range[0] > range[1]){
+			range[1] = range[0]
+		}
+		if(leftOrRight == 1 && range[0]> range[1]){
+			range[0] = range[1]
+		}
+		
 	}
 	let bcss = 'red';
 </script>

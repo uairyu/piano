@@ -41,14 +41,15 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .scroll-width {
 	@parent-width: 150px;
 	overflow: auto;
 	width: @parent-width;
 	padding-top: 5px;
 	.child-width {
-		height: 1px;
+		// add some tags
+		// height: 1px;
 		width: @parent-width * 10;
 	}
 }
