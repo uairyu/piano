@@ -18,6 +18,7 @@
 		<div>
 			<select v-model.number="range[0]" @change="rangeChange(0)">
 				<!-- rebase test 1 -->
+				<!-- rebase test 2 -->
 				<option>2</option>
 				<option>3</option>
 				<option>4</option>
