@@ -21,7 +21,7 @@ export default {
 		scrollBarValue.value = initRate;
 		onMounted(() => {
 			let scrollEl: HTMLElement = scroll.value;
-			
+
 			// console.log(scrollEl.offsetWidth);
 			// console.log(scrollEl.scrollWidth);
 			scrollEl.scrollLeft = initRate / maxRate * scrollEl.scrollWidth;
@@ -48,8 +48,7 @@ export default {
 	width: @parent-width;
 	padding-top: 5px;
 	.child-width {
-		// add some tags
-		// height: 1px;
+		height: 1px;
 		width: @parent-width * 10;
 	}
 }
