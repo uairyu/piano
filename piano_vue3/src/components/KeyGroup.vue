@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import Global from "@/common-js/Global";
+import Global from "../common-js/Global";
 import { computed, reactive, ref } from "vue";
 export default {
   props:{
