@@ -35,7 +35,7 @@
   <p>volume{{volume}}</p>
   <div>
     <button @click="tabNameClick(PerfectPitchComponent)" id="PerfectPitch">Perfect Pitch</button>
-    <button @click="tabNameClick(ComplexToneComponent)" id="Complextone">Complex tone</button>
+    <button @click="tabNameClick(ComplexToneComponent)" id="Complextone">Complex Tone</button>
     <button @click="tabNameClick(IntervalComponent)" id="Interval">Interval</button>
     <component :is="tabComp" @wantPlay = "wantPlay"></component>
   </div>
