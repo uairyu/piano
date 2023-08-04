@@ -87,13 +87,13 @@ function rangeChange(leftOrRight: number) {
 }
 
 function startNewTest() {
-	if (isStarted.value) {
+	isStarted.value = !isStarted.value;
+	if (!isStarted.value) {
 		resetStatistic();
 	} else {
-		// genNextVoice();
-		nextNote()
+		genNextVoice();
+		// nextNote()
 	}
-	isStarted.value = !isStarted.value;
 }
 let keyNoteCssFunc = function (index: number) {
 	if (index >= 100) {
@@ -168,8 +168,12 @@ function genNextVoice() {
 		console.log(flatNoteAllKey[currentNoteInfo.absNoteIndex[i]]);
 		// currentNoteInfo.ansIndex = random.next(35) + 12 ;
 		// currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
-		emits("wantPlay", flatNoteAllKey[currentNoteInfo.absNoteIndex[i]]);
 	}
+	let tmp = currentNoteInfo.absNoteIndex.map(x => {
+		return flatNoteAllKey[x];
+	}
+	);
+	emits("wantPlay", tmp);
 }
 class rand {
 	public seed;
@@ -248,8 +252,12 @@ function hearAgain() {
 				"curNoteIndex " + currentNoteInfo.curNoteAnsIndex,
 				"absNote " + currentNoteInfo.absNoteIndex
 			);
-			emits("wantPlay", flatNoteAllKey[currentNoteInfo.absNoteIndex[i]]);
+			// emits("wantPlay", flatNoteAllKey[currentNoteInfo.absNoteIndex[i]]);
 		}
+		emits("wantPlay", currentNoteInfo.absNoteIndex.map(x => {
+			return flatNoteAllKey[x];
+		}
+		));
 	}
 }
 let flatNoteAllKey = Global.KeyNoteFullPath.value.flat();

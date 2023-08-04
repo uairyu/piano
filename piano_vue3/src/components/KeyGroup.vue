@@ -51,6 +51,7 @@ export default {
     function play(audioBuffer: AudioBuffer[]){
       let gainNode = audioCtx.createGain();
       gainNode.gain.value = Math.min(props.controlVolume, maxVolumn);
+      gainNode.connect(audioCtx.destination);
       let sourceNodes = audioBuffer.map(adBuffer => {
         let bufferNode: AudioBufferSourceNode = audioCtx.createBufferSource();
         bufferNode.buffer = adBuffer;
@@ -59,7 +60,6 @@ export default {
         bufferNode.connect(gainNode);
         return bufferNode;
       })
-      gainNode.connect(audioCtx.destination);
       sourceNodes.forEach(source => source.start(0, 0));
     }
     const notePath = computed(()=>Global.KeyNotePath.value);
