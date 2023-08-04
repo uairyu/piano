@@ -55,7 +55,9 @@
 			<span style="display: block">Option</span>
 
 			<span style="display: block">
-				<input type="checkbox" v-model="autoNext" />autoNext
+				<input type="checkbox" v-model="config_autoNext" />autoNext
+				<input type="checkbox" v-model="config_sameCurKeyNote" />允许相同键位
+
 			</span>
 			<button :style="keyNoteCssFunc(index + 100)" @click="keyNoteOptionClick(index)" v-for="(i, index) in plainKeyName"
 				:key="i" :id="String('open' + (index + 1))">
@@ -111,7 +113,7 @@ function keyNoteClick(absIndex: number) {
 	let index = absIndex - 1;
 	console.log(successCnt.value === complextCnt.value && passNext && isStarted.value);
 	if (isStarted.value) {
-		if (currentNoteInfo.absNoteIndex.find((item) => item === absIndex) !== undefined) {
+		if (currentNoteInfo.curNoteAnsIndex.find((item) => item === absIndex) !== undefined) {
 			// if (absIndex === currentNoteInfo.absNoteIndex) {
 			keyNoteStatus[index] = 1;
 			completed.value += 1;
@@ -119,7 +121,7 @@ function keyNoteClick(absIndex: number) {
 			successCnt.value++;
 			if (successCnt.value === complextCnt.value) {
 				passNext.value = true;
-				if (autoNext.value) {
+				if (config_autoNext.value) {
 					nextNote();
 				}
 			}
@@ -152,13 +154,17 @@ function genNextVoice() {
 		let b = 12 * (random.next(range[0], range[1] + 1) - 1);
 		console.log("ab", a, b);
 		let nextAbsIndex = validNoteIndex[a] + b;
-		currentNoteInfo.ansIndex.push(nextAbsIndex);
-		currentNoteInfo.absNoteIndex.push((nextAbsIndex % 12) + 1);
-		console.log(flatNoteAllKey.value[currentNoteInfo.ansIndex[i]]);
-
+		let curNoteIndex = (nextAbsIndex % 12) + 1;
+		if(config_sameCurKeyNote.value && currentNoteInfo.curNoteAnsIndex.includes(curNoteIndex)){
+			--i;
+			continue;
+		}
+		currentNoteInfo.absNoteIndex.push(nextAbsIndex);
+		currentNoteInfo.curNoteAnsIndex.push(curNoteIndex);
+		console.log(flatNoteAllKey.value[currentNoteInfo.absNoteIndex[i]]);
 		// currentNoteInfo.ansIndex = random.next(35) + 12 ;
 		// currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
-		emits("wantPlay", flatNoteAllKey.value[currentNoteInfo.ansIndex[i]]);
+		emits("wantPlay", flatNoteAllKey.value[currentNoteInfo.absNoteIndex[i]]);
 	}
 }
 class rand {
@@ -196,7 +202,8 @@ let passNext = ref(false);
 let validNoteIndex: number[] = [];
 let range: number[] = reactive([3, 3]);
 let avgTime = ref(0);
-let autoNext = ref(true);
+let config_autoNext = ref(true);
+let config_sameCurKeyNote = ref(false);
 let keyNoteStatusCss = [
 	{
 		backgroundColor: "rgb(40, 130, 207)",
@@ -216,28 +223,28 @@ let keyNoteStatusCss = [
 	},
 ];
 interface CurrentNoteInfo {
-	ansIndex: Array<number>;
 	absNoteIndex: Array<number>;
+	curNoteAnsIndex: Array<number>;
 	reset: () => void;
 }
 let currentNoteInfo: CurrentNoteInfo = {
-	ansIndex: [],
 	absNoteIndex: [],
+	curNoteAnsIndex: [],
 	reset() {
-		this.ansIndex.splice(0);
 		this.absNoteIndex.splice(0);
+		this.curNoteAnsIndex.splice(0);
 	},
 };
 
 function hearAgain() {
 	if (isStarted.value) {
 		for (let i = 0; i < complextCnt.value; ++i) {
-			console.log(flatNoteAllKey.value[currentNoteInfo.ansIndex[i]]);
+			console.log(flatNoteAllKey.value[currentNoteInfo.absNoteIndex[i]]);
 			console.log(
-				"absIndex " + currentNoteInfo.absNoteIndex,
-				"index " + currentNoteInfo.ansIndex
+				"curNoteIndex " + currentNoteInfo.curNoteAnsIndex,
+				"absNote " + currentNoteInfo.absNoteIndex
 			);
-			emits("wantPlay", flatNoteAllKey.value[currentNoteInfo.ansIndex[i]]);
+			emits("wantPlay", flatNoteAllKey.value[currentNoteInfo.absNoteIndex[i]]);
 		}
 	}
 }
