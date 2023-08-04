@@ -12,9 +12,13 @@
   function getRate(newValue: number): void{
     volume.value = Number((newValue*100 + '').substring(0,5));
   }
-  function wantPlay(noteFullPath:string){
-    keyGroup.value.controlPlay(noteFullPath);
-
+  function wantPlay(noteFullPath:string): any;
+  function wantPlay(noteFullPath: any){
+    if(typeof noteFullPath ==='string' ){
+      keyGroup.value.controlPlay([noteFullPath]);
+    }else{
+      keyGroup.value.controlPlay(noteFullPath);
+    }
   }
   let tabComp = shallowRef(null);
 

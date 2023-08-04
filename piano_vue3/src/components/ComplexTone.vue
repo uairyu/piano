@@ -85,11 +85,13 @@ function rangeChange(leftOrRight: number) {
 		range[0] = range[1];
 	}
 }
+
 function startNewTest() {
 	if (isStarted.value) {
 		resetStatistic();
 	} else {
-		genNextVoice();
+		// genNextVoice();
+		nextNote()
 	}
 	isStarted.value = !isStarted.value;
 }
@@ -114,15 +116,17 @@ function keyNoteClick(absIndex: number) {
 	console.log(successCnt.value === complextCnt.value && passNext && isStarted.value);
 	if (isStarted.value) {
 		if (currentNoteInfo.curNoteAnsIndex.find((item) => item === absIndex) !== undefined) {
-			// if (absIndex === currentNoteInfo.absNoteIndex) {
-			keyNoteStatus[index] = 1;
-			completed.value += 1;
-			avgTime.value = Number((elapsedTime.value / completed.value).toFixed(2));
-			successCnt.value++;
-			if (successCnt.value === complextCnt.value) {
-				passNext.value = true;
-				if (config_autoNext.value) {
-					nextNote();
+			if (keyNoteStatus[index] !== 1){
+				// if (absIndex === currentNoteInfo.absNoteIndex) {
+				keyNoteStatus[index] = 1;
+				completed.value += 1;
+				avgTime.value = Number((elapsedTime.value / completed.value).toFixed(2));
+				successCnt.value++;
+				if (successCnt.value === complextCnt.value) {
+					passNext.value = true;
+					if (config_autoNext.value) {
+						nextNote();
+					}
 				}
 			}
 		} else {
@@ -155,7 +159,7 @@ function genNextVoice() {
 		console.log("ab", a, b);
 		let nextAbsIndex = validNoteIndex[a] + b;
 		let curNoteIndex = (nextAbsIndex % 12) + 1;
-		if(config_sameCurKeyNote.value && currentNoteInfo.curNoteAnsIndex.includes(curNoteIndex)){
+		if(!config_sameCurKeyNote.value && currentNoteInfo.curNoteAnsIndex.includes(curNoteIndex)){
 			--i;
 			continue;
 		}

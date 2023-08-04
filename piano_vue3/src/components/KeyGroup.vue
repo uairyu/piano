@@ -38,9 +38,9 @@ export default {
 
     function getData(name: string){
       if(map[name] === undefined){
-        fetch(name).then(r=>  {
-          r.arrayBuffer().then(r2=>{
-            let decodeData = audioCtx.decodeAudioData(r2);
+        fetch(name).then(response=>  {
+          response.arrayBuffer().then(buffer=>{
+            let decodeData = audioCtx.decodeAudioData(buffer);
             decodeData.then(audioBuffer =>{
               map[name]=audioBuffer;
             })
@@ -48,16 +48,19 @@ export default {
         })
       }
     }
-    function play(audioBuffer: AudioBuffer){
-      let bufferNode: AudioBufferSourceNode = audioCtx.createBufferSource();
+    function play(audioBuffer: AudioBuffer[]){
       let gainNode = audioCtx.createGain();
-      bufferNode.buffer = audioBuffer;
-      // bufferNode.connect(audioCtx.destination)
-
       gainNode.gain.value = Math.min(props.controlVolume, maxVolumn);
-      bufferNode.connect(gainNode);
+      let sourceNodes = audioBuffer.map(adBuffer => {
+        let bufferNode: AudioBufferSourceNode = audioCtx.createBufferSource();
+        bufferNode.buffer = adBuffer;
+        // bufferNode.connect(audioCtx.destination)
+
+        bufferNode.connect(gainNode);
+        return bufferNode;
+      })
       gainNode.connect(audioCtx.destination);
-      bufferNode.start(0, 0);
+      sourceNodes.forEach(source => source.start(0, 0));
     }
     const notePath = computed(()=>Global.KeyNotePath.value);
     function changeStyle(path: string, index: number){
@@ -67,8 +70,9 @@ export default {
         activeStyleIndex[index ^ 1] ^= 1;
       }
     }
-    function controlPlay(fullPath: string){
-      play(map[fullPath])
+
+    function controlPlay(fullPaths: string[]){
+      play(fullPaths.map(eachPath =>{ return map[eachPath]}))
     }
     let blackPos = [13, 43, 82, 111, 140];
     let iterWhite = 0, iterBlack = 0;

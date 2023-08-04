@@ -135,7 +135,7 @@
 		if(isStarted.value){
 			resetStatistic()
 		}else{
-			genNextVoice()
+			nextNote()
 		}
 		isStarted.value=!isStarted.value;
 	}
