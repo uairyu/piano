@@ -51,6 +51,7 @@ export default {
     function play(audioBuffer: AudioBuffer[]){
       let gainNode = audioCtx.createGain();
       gainNode.gain.value = Math.min(props.controlVolume, maxVolumn);
+      gainNode.connect(audioCtx.destination);
       let sourceNodes = audioBuffer.map(adBuffer => {
         let bufferNode: AudioBufferSourceNode = audioCtx.createBufferSource();
         bufferNode.buffer = adBuffer;
@@ -59,7 +60,6 @@ export default {
         bufferNode.connect(gainNode);
         return bufferNode;
       })
-      gainNode.connect(audioCtx.destination);
       sourceNodes.forEach(source => source.start(0, 0));
     }
     const notePath = computed(()=>Global.KeyNotePath.value);
@@ -88,7 +88,7 @@ export default {
       const newLocal = notePath.value + keyMapWhite[Number(el.id)];
       getData(newLocal);
       el.onclick = el.onclick? el.onclick: (ev) =>{
-        play(map[notePath.value + keyMapWhite[Number(el.id)]]);
+        play([map[notePath.value + keyMapWhite[Number(el.id)]]]);
       }
     }
 
@@ -104,7 +104,7 @@ export default {
       // console.log(newLocal);
       getData(newLocal);
       el.onclick = (ev) => {
-        play(map[newLocal]);
+        play([map[newLocal]]);
       }
     }
     let styleList = [
