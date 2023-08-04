@@ -91,8 +91,8 @@ function startNewTest() {
 	if (!isStarted.value) {
 		resetStatistic();
 	} else {
-		genNextVoice();
-		// nextNote()
+		// genNextVoice();
+		nextNote()
 	}
 }
 let keyNoteCssFunc = function (index: number) {

@@ -88,7 +88,7 @@ export default {
       const newLocal = notePath.value + keyMapWhite[Number(el.id)];
       getData(newLocal);
       el.onclick = el.onclick? el.onclick: (ev) =>{
-        play(map[notePath.value + keyMapWhite[Number(el.id)]]);
+        play([map[notePath.value + keyMapWhite[Number(el.id)]]]);
       }
     }
 
@@ -104,7 +104,7 @@ export default {
       // console.log(newLocal);
       getData(newLocal);
       el.onclick = (ev) => {
-        play(map[newLocal]);
+        play([map[newLocal]]);
       }
     }
     let styleList = [
