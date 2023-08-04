@@ -90,7 +90,8 @@
 		absNoteIndex: 0,
 	}
 
-	let flatNoteAllKey = computed(()=> Global.KeyNoteFullPath.value.flat());
+	let flatNoteAllKey = Global.KeyNoteFullPath.value.flat();
+	// let flatNoteAllKey = computed(()=> Global.KeyNoteFullPath.value.flat());
 
 	setInterval(()=>{
 		if(isStarted.value){
@@ -99,9 +100,9 @@
 	},1000)
 	function hearAgain(){
 		if(isStarted.value){
-			console.log(flatNoteAllKey.value[currentNoteInfo.ansIndex]);
+			console.log(flatNoteAllKey[currentNoteInfo.ansIndex]);
 			console.log("absIndex " + currentNoteInfo.absNoteIndex,"index "+currentNoteInfo.ansIndex);
-			emits('wantPlay', flatNoteAllKey.value[currentNoteInfo.ansIndex])
+			emits('wantPlay', flatNoteAllKey[currentNoteInfo.ansIndex])
 		}
 	}
 	function genNextVoice(){
@@ -120,7 +121,7 @@
 		currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
 		// currentNoteInfo.ansIndex = random.next(35) + 12 ;
 		// currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
-		emits('wantPlay', flatNoteAllKey.value[currentNoteInfo.ansIndex])
+		emits('wantPlay', flatNoteAllKey[currentNoteInfo.ansIndex])
 	}
 	function nextNote(){
 		passNext.value = false;
@@ -202,7 +203,7 @@
 		if(leftOrRight == 1 && range[0]> range[1]){
 			range[0] = range[1]
 		}
-		
+
 	}
 	let bcss = 'red';
 </script>

@@ -161,10 +161,10 @@ function genNextVoice() {
 		}
 		currentNoteInfo.absNoteIndex.push(nextAbsIndex);
 		currentNoteInfo.curNoteAnsIndex.push(curNoteIndex);
-		console.log(flatNoteAllKey.value[currentNoteInfo.absNoteIndex[i]]);
+		console.log(flatNoteAllKey[currentNoteInfo.absNoteIndex[i]]);
 		// currentNoteInfo.ansIndex = random.next(35) + 12 ;
 		// currentNoteInfo.absNoteIndex = (currentNoteInfo.ansIndex ) % 12 + 1;
-		emits("wantPlay", flatNoteAllKey.value[currentNoteInfo.absNoteIndex[i]]);
+		emits("wantPlay", flatNoteAllKey[currentNoteInfo.absNoteIndex[i]]);
 	}
 }
 class rand {
@@ -239,16 +239,16 @@ let currentNoteInfo: CurrentNoteInfo = {
 function hearAgain() {
 	if (isStarted.value) {
 		for (let i = 0; i < complextCnt.value; ++i) {
-			console.log(flatNoteAllKey.value[currentNoteInfo.absNoteIndex[i]]);
+			console.log(flatNoteAllKey[currentNoteInfo.absNoteIndex[i]]);
 			console.log(
 				"curNoteIndex " + currentNoteInfo.curNoteAnsIndex,
 				"absNote " + currentNoteInfo.absNoteIndex
 			);
-			emits("wantPlay", flatNoteAllKey.value[currentNoteInfo.absNoteIndex[i]]);
+			emits("wantPlay", flatNoteAllKey[currentNoteInfo.absNoteIndex[i]]);
 		}
 	}
 }
-let flatNoteAllKey = computed(() => Global.KeyNoteFullPath.value.flat());
+let flatNoteAllKey = Global.KeyNoteFullPath.value.flat();
 // let flatNoteAllKey = computed(() => Global.KeyNoteFullPath.value.flat());
 </script>
 
