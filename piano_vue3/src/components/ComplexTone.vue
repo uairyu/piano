@@ -346,13 +346,6 @@ watch(() => [csSaverInfo, csSaverInfo.range],
 		console.log(tmp);
 	}
 ,{deep: true});
-// watchEffect(() => {
-// 	console.log(csSaverInfo.range[0]);
-// 	csSaverInfo.range[1];
-// 	cs.serializeObjectToCookie(COOKIEKEY, csSaverInfo);
-// 	let tmp: CookieSaverInfo = cs.deserializeObjectFromCookie(COOKIEKEY);
-// 	console.log("kkk" + tmp);
-// });
 let flatNoteAllKey = Global.KeyNoteFullPath.value.flat();
 let keyNoteCssFunc = function (index: number, rangeKey?: string) {
 	if (index >= 100) {
