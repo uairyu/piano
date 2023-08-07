@@ -47,7 +47,7 @@
 		<button style="margin-top: 45px" class="control-item" v-text="!isStarted ? 'Start Quiz' : 'Stop Quiz'"
 			@click="startNewTest"></button>
 		<div>
-			复音数：<select v-model.number="complextCnt">
+			复音数：<select v-model.number="config_complexCnt">
 				<option>1</option>
 				<option>2</option>
 				<option>3</option>
@@ -92,12 +92,24 @@
 		</div>
 	</div>
 </template>
-
+/
 <script setup lang="ts">
 import Global from "../common-js/Global";
-import { ref, computed, reactive } from "vue";
+import CookieSaver from "../common-js/CookieSaver";
+import { ref, computed, reactive, watch, shallowReactive, shallowRef, watchEffect } from "vue";
 const emits = defineEmits(["wantPlay"]);
-function resetStatistic() {
+
+interface CookieSaverInfo{
+	range: number[];
+	complexCnt: number;
+	singleLayout: boolean;
+	allowSameKeyNote: boolean;
+}
+
+
+
+
+function resetStatistic(): void {
 	completed.value = 0;
 	errorCnt.value = 0;
 	elapsedTime.value = 0;
@@ -131,14 +143,7 @@ function startNewTest() {
 		nextNote()
 	}
 }
-let keyNoteCssFunc = function (index: number, rangeKey?: string) {
-	if (index >= 100) {
-		//Option
-		return keyNoteStatusCss[keyNoteOptionStatus[index - 100]];
-	}
-	let j = rangeKey? rangeKey: "";
-	return keyNoteStatusCss[keyNoteStatus[j][index]];
-};
+
 function keyNoteOptionClick(index: number) {
 	if (keyNoteOptionStatus[index] === 3) {
 		keyNoteOptionStatus[index] = 0;
@@ -146,11 +151,11 @@ function keyNoteOptionClick(index: number) {
 		keyNoteOptionStatus[index] = 3;
 	}
 }
-let successCnt = ref(0);
+
 function keyNoteClick(keyCurIndex: number, rangeKey: string) {
 	console.log(keyCurIndex);
 	let index = keyCurIndex - 1;
-	console.log(successCnt.value === complextCnt.value && passNext && isStarted.value);
+	console.log(successCnt.value === config_complexCnt.value && passNext && isStarted.value);
 	if (isStarted.value) {
 		let absIndex = validNoteIndex[index] + ((Number(rangeKey[1])) -1) * 12;
 		console.log("after cal for " + keyCurIndex + " is " + absIndex);
@@ -167,7 +172,7 @@ function keyNoteClick(keyCurIndex: number, rangeKey: string) {
 				completed.value += 1;
 				avgTime.value = Number((elapsedTime.value / completed.value).toFixed(2));
 				successCnt.value++;
-				if (successCnt.value === complextCnt.value) {
+				if (successCnt.value === config_complexCnt.value) {
 					passNext.value = true;
 					if (config_autoNext.value) {
 						nextNote();
@@ -198,7 +203,7 @@ function genNextVoice() {
 		}
 	});
 	currentNoteInfo.reset();
-	for (let i: number = 0; i < complextCnt.value; ++i) {
+	for (let i: number = 0; i < config_complexCnt.value; ++i) {
 		let a = random.next(validNoteIndex.length);
 		let b = 12 * (random.next(config_range[0], config_range[1] + 1) - 1);
 		console.log("ab", a, b);
@@ -249,7 +254,7 @@ let keyNoteStatus: KeyNoteStatus = reactive({
 });
 let keyNoteOptionStatus = reactive([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 const random = new rand();
-let complextCnt = ref(2);
+let config_complexCnt = ref(2);
 let completed = ref(0);
 let errorCnt = ref(0);
 let ScorePercent = computed(() =>
@@ -300,7 +305,7 @@ let currentNoteInfo: CurrentNoteInfo = {
 
 function hearAgain() {
 	if (isStarted.value) {
-		for (let i = 0; i < complextCnt.value; ++i) {
+		for (let i = 0; i < config_complexCnt.value; ++i) {
 			console.log(flatNoteAllKey[currentNoteInfo.absNoteIndex[i]]);
 			console.log(
 				"curNoteIndex " + currentNoteInfo.curNoteAnsIndex,
@@ -314,7 +319,51 @@ function hearAgain() {
 		));
 	}
 }
+//Cookie
+const COOKIEKEY: string = "ComplexTone";
+let cs = new CookieSaver();
+let csSaverInfo: CookieSaverInfo = reactive({
+	range: config_range,
+	complexCnt: config_complexCnt,
+	singleLayout: config_singleLayout,
+	allowSameKeyNote: config_sameCurKeyNote
+});
+let configInfo: CookieSaverInfo = cs.deserializeObjectFromCookie(COOKIEKEY);
+if (configInfo){
+	// console.log(configInfo);
+	config_range[1] = configInfo.range[1];
+	config_range[0] = configInfo.range[0];
+	rangeChange(0);
+	rangeChange(1);
+	config_complexCnt.value = configInfo.complexCnt;
+	config_singleLayout.value = configInfo.singleLayout;
+	config_sameCurKeyNote.value = configInfo.allowSameKeyNote;
+}
+watch(() => [csSaverInfo, csSaverInfo.range],
+	() => {
+		cs.serializeObjectToCookie(COOKIEKEY, csSaverInfo);
+		let tmp: CookieSaverInfo = cs.deserializeObjectFromCookie(COOKIEKEY);
+		console.log(tmp);
+	}
+,{deep: true});
+// watchEffect(() => {
+// 	console.log(csSaverInfo.range[0]);
+// 	csSaverInfo.range[1];
+// 	cs.serializeObjectToCookie(COOKIEKEY, csSaverInfo);
+// 	let tmp: CookieSaverInfo = cs.deserializeObjectFromCookie(COOKIEKEY);
+// 	console.log("kkk" + tmp);
+// });
 let flatNoteAllKey = Global.KeyNoteFullPath.value.flat();
+let keyNoteCssFunc = function (index: number, rangeKey?: string) {
+	if (index >= 100) {
+		//Option
+		return keyNoteStatusCss[keyNoteOptionStatus[index - 100]];
+	}
+	let j = rangeKey ? rangeKey : "";
+	return keyNoteStatusCss[keyNoteStatus[j][index]];
+};
+let successCnt = ref(0);
+
 // let flatNoteAllKey = computed(() => Global.KeyNoteFullPath.value.flat());
 </script>
 
