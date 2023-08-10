@@ -289,6 +289,11 @@ let keyNoteStatusCss = [
 		color: "aliceblue",
 	},
 ];
+setInterval(() => {
+	if (isStarted.value) {
+		elapsedTime.value += 1
+	}
+}, 1000)
 interface CurrentNoteInfo {
 	absNoteIndex: Array<number>;
 	curNoteAnsIndex: Array<number>;
