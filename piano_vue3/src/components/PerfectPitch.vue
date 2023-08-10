@@ -10,7 +10,7 @@
 	<button @click="hearAgain" class="control-item" v-show="isStarted">Hear Again</button>
 	<button v-show="passNext && isStarted" @click="nextNote" class="next control-item ">Hear Next</button>
 	<div class="key-note-container">
-		<button v-show="keyNoteOptionStatus[index] === 0" :style="keyNoteCssFunc(index)" @click="keyNoteClick(index + 1)"
+		<button class = "key-note-button"  v-show="keyNoteOptionStatus[index] === 0" :style="keyNoteCssFunc(index)" @click="keyNoteClick(index + 1)"
 			v-for="(i,index) in plainKeyName" :key="i" :id="String(index + 1)">{{i}}</button>
 	</div>
 	<div class="control-panel">
@@ -244,10 +244,14 @@
 	.key-note-container{
 		margin:auto;
 		display: flex;
-		width: 275px;
+		width: 300px;
 		justify-content: space-evenly;
 		flex-flow: row wrap;
 		align-items: center;
 		align-content: space-around;
+		.key-note-button{
+			margin-bottom: 6px;
+			// margin-right: px;
+		}
 	}
 </style>
