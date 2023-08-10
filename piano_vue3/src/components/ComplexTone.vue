@@ -377,6 +377,9 @@ let successCnt = ref(0);
 	@scale-width: 10%;
 	@key-layout-width: @parent-width - @scale-width;
 	margin: auto;
+	margin-bottom: 10px;
+	margin-top: 15px;
+	padding: 0;
 	display: flex;
 	width: @parent-width;
 	justify-content: space-evenly;
@@ -389,7 +392,8 @@ let successCnt = ref(0);
 		width: 40px;
 		text-align: center;
 		padding: 5px;
-		margin: 1.8px;
+		margin-top: 8px;
+		margin-right: 1.7px;
 	}
 	.key-button-layout{
 		width: 100% - 2* @scale-width;
