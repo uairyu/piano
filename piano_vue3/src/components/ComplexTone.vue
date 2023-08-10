@@ -389,7 +389,7 @@ let successCnt = ref(0);
 		width: 40px;
 		text-align: center;
 		padding: 5px;
-
+		margin: 1.8px;
 	}
 	.key-button-layout{
 		width: 100% - 2* @scale-width;
