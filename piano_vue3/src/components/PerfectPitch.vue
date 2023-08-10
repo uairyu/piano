@@ -208,8 +208,7 @@
 	let bcss = 'red';
 </script>
 <style lang="less" scoped>
-
-	.next{
+.next{
 		background-color: rgb(117, 248, 139) !important ;
 		color: white !important;
 		font-weight: 400;
@@ -243,15 +242,21 @@
 	}
 	.key-note-container{
 		margin:auto;
+		margin-top: 20px;
 		display: flex;
-		width: 300px;
+		width: 320px;
 		justify-content: space-evenly;
 		flex-flow: row wrap;
 		align-items: center;
 		align-content: space-around;
-		.key-note-button{
-			margin-bottom: 6px;
-			// margin-right: px;
-		}
+		.key-note-button {
+				padding: 0px;
+				margin-bottom: 6px;
+				width: 55px;
+				height: 44px;
+				text-align: center;
+				margin-right: 5px;
+				margin-bottom: 10px;
+			}
 	}
 </style>
