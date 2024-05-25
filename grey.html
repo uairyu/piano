@@ -45,62 +45,69 @@
     }
     .key-note-button {
         padding: 0;
-        width: 25px;
-        height: 30px;
+        /* width: 33px; */
+        height: 35px;
         text-align: center;
-        margin-right: 5px;
-        margin-bottom: 5px
+		/* max-width: 100px; */
+		flex: 1 0 auto;
+        margin-right: 1%;
+        /* margin-bottom: 5px */
+    }
+	.key-note-button:last-child {
+        margin-right: 0px;
     }
 </style>
 </head>
 <body>
 <div id="bwImage"></div>
-
-<div style="display: flex;height:100%; width: 100%;">
-    <div style="width: 55%;">
-        <div id="brightnessControls" >
-            <label for="H">H:</label>
-            <input type="range" id="H" min="0" max="360" value="0">
-            <span id = "HValue"></span>
-            <br>
-            <label for="S">S:</label>
-            <input type="range" id="S" min="0" max="100" value="0">
-            <span id = "SValue"></span>
-            <br>
-            <label for="B">B:</label>
-            <input type="range" id="B" min="0" max="100" value="0">
-            <span id = "BValue"></span>
-        </div>
-        <label for="maxPrecision">精度:</label>
-        <input type="range" id="precision" min="1" max="10" value="5">
-        <span id = "curPrecision">5</span>
-        <br>
-        <span>选择与正确答案的误差范围为±<span id="calPrecision">2</span></span>
-        <br>
-        <button id="showHSB" onclick = "hideShowHSB()">hide HSB</button>
-    </div>
-    <div style="width: 45%;">
-        <label for="minBrightness">Min Brightness:</label>
-        <input type="range" id="minBrightness" min="0" max="100" value="0">
-        <span id = "minBValue">0</span>
-        <br>
-        <label for="maxBrightness">Max Brightness:</label>
-        <input type="range" id="maxBrightness" min="0" max="100" value="100">
-        <span id = "maxBValue">100</span>
-        <div>
-            <button style="height: 50px;width: 100%; "onclick="nextColor()">next</button>
-        </div>
-    </div>
+<button onclick="foldConfig()" style="width: 100%;">↕</button>
+<div id = 'configGroup' style="display: block;">
+	<div style="display: flex;height:100%; width: 100%;">
+		<div style="width: 55%;">
+			<div id="brightnessControls" >
+				<label for="H">H:</label>
+				<input type="range" id="H" min="0" max="360" value="0">
+				<span id = "HValue"></span>
+				<br>
+				<label for="S">S:</label>
+				<input type="range" id="S" min="0" max="100" value="0">
+				<span id = "SValue"></span>
+				<br>
+				<label for="B">B:</label>
+				<input type="range" id="B" min="0" max="100" value="0">
+				<span id = "BValue"></span>
+			</div>
+			<label for="maxPrecision">精度:</label>
+			<input type="range" id="precision" min="1" max="10" value="5">
+			<span id = "curPrecision">5</span>
+			<br>
+			<span>选择与正确答案的误差范围为±<span id="calPrecision">2</span></span>
+			<br>
+			<button id="showHSB" onclick = "hideShowHSB()">hide HSB</button>
+		</div>
+		<div style="width: 45%;">
+			<label for="minBrightness">Min Brightness:</label>
+			<input type="range" id="minBrightness" min="0" max="100" value="0">
+			<span id = "minBValue">0</span>
+			<br>
+			<label for="maxBrightness">Max Brightness:</label>
+			<input type="range" id="maxBrightness" min="0" max="100" value="100">
+			<span id = "maxBValue">100</span>
+			
+		</div>
+	</div>
+	<div>
+		<input type="checkbox" id="randomH"> random H</input>
+		<input type="checkbox" id="randomS"> random S</input>
+		<input type="checkbox" id="changeBK">背景色都改</input>
+	</div>
 </div>
 <div>
-
-    <input type="checkbox" id="randomH"> random H</input>
-    <input type="checkbox" id="randomS"> random S</input>
-    <input type="checkbox" id="changeBK">背景色都改</input>
+	<button style="height: 30px;width: 100%; "onclick="nextColor()">next</button>
 </div>
 <div class="statistic-container ">
   <span class="statistic-panel">B相差: <span id = "dis" style="font-size: 24px;"></span></span>
-  <span class="statistic-panel" >正确: <span id = 'correct'>0</span></span>
+  <span class="statistic-panel">正确: <span id = 'correct'>0</span></span>
   <span class="statistic-panel">错误: <span id = 'fail'>0</span></span>
   <span class="statistic-panel">正确率: <span id = 'score'>0</span>%</span>
   <span class="statistic-panel">时间: <span id = 'sumTime'>0</span> 秒</span>
@@ -114,6 +121,7 @@
     let lastTime = new Date()
     let beginTime = new Date()  
     let hasBegin = false
+    const configGroup = document.getElementById('configGroup')
     const changeBK = document.getElementById('changeBK')
     const correct = document.getElementById('correct')
     const fail = document.getElementById('fail')
@@ -171,6 +179,13 @@
         refreshButtons()
     });
     let isHideHSB = false;
+	function foldConfig(){
+		if(configGroup.style.display == 'none'){
+			configGroup.style.display = 'block'
+		}else{
+			configGroup.style.display = 'none'
+		}
+	}
     function hideShowHSB(){
         isHideHSB ^= true
         brightnessControls.style.opacity = isHideHSB? "0": "100";
@@ -180,7 +195,6 @@
             max: parseInt(maxBrightnessInput.value)}
     }
     function nextColor(){
-       
         if(!hasBegin){
             hasBegin = true
             beginTime = new Date()
@@ -324,14 +338,15 @@
         let d = parseInt(maxBrightnessInput.value)
         for(let i = minB; i < maxB; i++){
             let t = i* 10
-            s = s + `<div class="key-note-container"><button class = 'key-note-button' onclick="checkBrightness(${i*10})">${t}</button>` + ":"
+            s = s + `<div class="key-note-container"><button class = 'key-note-button' onclick="checkBrightness(${i*10})">${t}</button>`
             for(let j = 0; j < 10 / parseInt(precision.value) && t + j * parseInt(precision.value) < parseInt(maxBrightnessInput.value); ++j){
                 let tt = t +j * parseInt(precision.value)
                 s += `<button class='key-note-button' onclick="checkBrightness(${tt})">${tt}</button>` 
             }
             s+= '</div></br>'
         }
-        s = s + `<button class='key-note-button' onclick="checkBrightness(${d})">${d}</button>` + ":"
+        s = s + `<button class='key-note-button' onclick="checkBrightness(${d})">${d}</button>` 
+        s = s + `<button class='key-note-button' onclick="checkBrightness(${d})">${d}</button>` 
         buttons.innerHTML = s
     }
     refreshButtons()
