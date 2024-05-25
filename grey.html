@@ -248,7 +248,7 @@
         let curB = parseInt(B.value);
         let curPre = parseInt(precision.value)
         let isCorrect = false
-        if(Math.abs(targetBrightness - curB) < (curPre / 2)){
+        if(Math.abs(targetBrightness - curB) <= Math.floor(curPre / 2)){
             isCorrect = true
         }else{
             isCorrect = false
