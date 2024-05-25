@@ -2,15 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer" />
+    <link rel="stylesheet" href="https://registry.npmmirror.com/mdui/1/files/dist/css/mdui.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M3U8 Video Player</title>
+    <style>
+    /* 为网格布局内的元素添加圆角效果 */
+    .mdui-col > div, .mdui-col > a {
+        border-radius: 10px;
+        transition: transform .5s;
+    }
+
+    .mdui-col > div:hover {
+        /* 渐变背景色 */
+        background: linear-gradient(-45deg, #009688, #B2DFDB);
+        color: white;
+        transform: translateY(-5px);
+    }
+</style>
 <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
 </head>
 <body>
-
+<div id = "info"></div>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 <input type="text" id="textInput" placeholder="">
-<button onclick="readInput()">读取输入框内容</button>
+<button onclick="readInput()">refresh</button>
 <video controls style="width: 100%; height:auto" id="video" autoplay></video>
  <script>
     var urlParams = new URLSearchParams(window.location.search);
@@ -41,12 +57,39 @@
         });
     };
 
+    function getLiveLink(data){
+        let k = /url: '(.*?)'/
+        let matches = data.match(k)
+        return matches[1]
+    }
+    function getImgInfo(data){
+        let k = /<div style="width: 100%;min-height: 100px;">[\d\D]*?<\/div>/
+        let matches = data.match(k)
+        console.log(matches)
+        return matches[0]
+    }
+    function getUserName(data){
+        let k = /<span.*?>(.*?)<\/span>/
+        let matches = data.match(k)
+        console.log(matches)
+        return matches[1]
+    }
+    function getRoomTitle(data){
+        let k = /<h6.*?>(.*?)<\/h6>/
+        let matches = data.match(k)
+        console.log(matches)
+        return matches[1]
+    }
     function showData(data) {
         var str = "";//定义用于拼接的字符串
         console.log(data)
-        let k = /url: '(.*?)'/
-        let matches = data.match(k)
-        liveLink =  matches[1]
+        liveLink = getLiveLink(data)
+        divInfo = getImgInfo(data)
+        userName = getUserName(divInfo)
+        roomTitle = getRoomTitle(divInfo)
+        document.title = userName + "-" + roomTitle
+
+        document.getElementById('info').innerHTML = divInfo
         playhls(liveLink)
     }
     function playhls(url){
