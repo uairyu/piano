@@ -61,29 +61,32 @@
         <div id="brightnessControls" >
             <label for="H">H:</label>
             <input type="range" id="H" min="0" max="360" value="0">
-            <label id = "HValue"></label>
+            <span id = "HValue"></span>
             <br>
             <label for="S">S:</label>
             <input type="range" id="S" min="0" max="100" value="0">
-            <label id = "SValue"></label>
+            <span id = "SValue"></span>
             <br>
             <label for="B">B:</label>
             <input type="range" id="B" min="0" max="100" value="0">
-            <label id = "BValue"></label>
+            <span id = "BValue"></span>
         </div>
         <label for="maxPrecision">精度:</label>
         <input type="range" id="precision" min="1" max="10" value="5">
-        <label id = "curPrecision">5</label>
+        <span id = "curPrecision">5</span>
+        <br>
+        <span>选择与正确答案的误差范围为±<span id="calPrecision">2</span></span>
+        <br>
         <button id="showHSB" onclick = "hideShowHSB()">hide HSB</button>
     </div>
     <div style="width: 45%;">
         <label for="minBrightness">Min Brightness:</label>
         <input type="range" id="minBrightness" min="0" max="100" value="0">
-        <label id = "minBValue">0</label>
+        <span id = "minBValue">0</span>
         <br>
         <label for="maxBrightness">Max Brightness:</label>
         <input type="range" id="maxBrightness" min="0" max="100" value="100">
-        <label id = "maxBValue">100</label>
+        <span id = "maxBValue">100</span>
         <div>
             <button style="height: 50px;width: 100%; "onclick="nextColor()">next</button>
         </div>
@@ -119,6 +122,7 @@
     const avgTime = document.getElementById('avgTime')
     const dis = document.getElementById('dis')
     const precision = document.getElementById('precision')
+    const calPrecision = document.getElementById('calPrecision')
     const curPrecision = document.getElementById('curPrecision')
     const bwImage = document.getElementById('bwImage');
     const minBrightnessInput = document.getElementById('minBrightness');
@@ -137,6 +141,7 @@
     const randomS = document.getElementById('randomS')
     precision.addEventListener('input', function () {
         curPrecision.innerHTML = precision.value;
+        calPrecision.innerHTML = Math.floor(parseInt(precision.value)/2)
         refreshButtons()
     });
     minBrightnessInput.addEventListener('input', function () {
@@ -243,7 +248,7 @@
         let curB = parseInt(B.value);
         let curPre = parseInt(precision.value)
         let isCorrect = false
-        if(Math.abs(targetBrightness - curB) < curPre){
+        if(Math.abs(targetBrightness - curB) < (curPre / 2)){
             isCorrect = true
         }else{
             isCorrect = false
