@@ -34,26 +34,49 @@
         font-weight: 700;
         white-space: nowrap
     }
+    .key-note-container{
+        margin: 5px auto auto;
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        flex-flow: row wrap;
+        align-items: center;
+        align-content: center
+    }
+    .key-note-button {
+        padding: 0;
+        width: 25px;
+        height: 30px;
+        text-align: center;
+        margin-right: 5px;
+        margin-bottom: 5px
+    }
 </style>
 </head>
 <body>
 <div id="bwImage"></div>
-<button id="showHSB" onclick = "hideShowHSB()">hide HSB</button>
-<div style="display: flex">
-    <div id="brightnessControls">
-        <label for="H">H:</label>
-        <input type="range" id="H" min="0" max="360" value="0">
-        <label id = "HValue"></label>
-        <br>
-        <label for="S">S:</label>
-        <input type="range" id="S" min="0" max="100" value="0">
-        <label id = "SValue"></label>
-        <br>
-        <label for="B">B:</label>
-        <input type="range" id="B" min="0" max="100" value="0">
-        <label id = "BValue"></label>
+
+<div style="display: flex;height:100%; width: 100%;">
+    <div style="width: 55%;">
+        <div id="brightnessControls" >
+            <label for="H">H:</label>
+            <input type="range" id="H" min="0" max="360" value="0">
+            <label id = "HValue"></label>
+            <br>
+            <label for="S">S:</label>
+            <input type="range" id="S" min="0" max="100" value="0">
+            <label id = "SValue"></label>
+            <br>
+            <label for="B">B:</label>
+            <input type="range" id="B" min="0" max="100" value="0">
+            <label id = "BValue"></label>
+        </div>
+        <label for="maxPrecision">精度:</label>
+        <input type="range" id="precision" min="1" max="10" value="1">
+        <label id = "curPrecision">1</label>
+        <button id="showHSB" onclick = "hideShowHSB()">hide HSB</button>
     </div>
-    <div>
+    <div style="width: 45%;">
         <label for="minBrightness">Min Brightness:</label>
         <input type="range" id="minBrightness" min="0" max="100" value="0">
         <label id = "minBValue">0</label>
@@ -61,16 +84,17 @@
         <label for="maxBrightness">Max Brightness:</label>
         <input type="range" id="maxBrightness" min="0" max="100" value="100">
         <label id = "maxBValue">100</label>
+        <div>
+            <button style="height: 50px;width: 100%; "onclick="nextColor()">next</button>
+        </div>
     </div>
 </div>
-<button onclick="nextColor()">next</button>
-<input type="checkbox" id="randomH"> random H</input>
-<input type="checkbox" id="randomS"> random S</input>
-<br>
-<label for="maxPrecision">精度:</label>
-<input type="range" id="precision" min="1" max="10" value="5">
-<label id = "curPrecision">5</label>
-</br>
+<div>
+
+    <input type="checkbox" id="randomH"> random H</input>
+    <input type="checkbox" id="randomS"> random S</input>
+    <input type="checkbox" id="changeBK">背景色都改</input>
+</div>
 <div class="statistic-container ">
   <span class="statistic-panel">B相差: <span id = "dis" style="font-size: 24px;"></span></span>
   <span class="statistic-panel" >正确: <span id = 'correct'>0</span></span>
@@ -79,7 +103,7 @@
   <span class="statistic-panel">时间: <span id = 'sumTime'>0</span> 秒</span>
   <span class="statistic-panel">平均时间: <span id="avgTime">0</span> 秒</span>
 </div>
-<div id="buttons">
+<div id="buttons" class="key-note-container">
    
 </div>
 <div id="result"></div>
@@ -87,6 +111,7 @@
     let lastTime = new Date()
     let beginTime = new Date()  
     let hasBegin = false
+    const changeBK = document.getElementById('changeBK')
     const correct = document.getElementById('correct')
     const fail = document.getElementById('fail')
     const score = document.getElementById('score')
@@ -134,11 +159,11 @@
          generateBlackWhiteImage()
     });
     minBrightnessInput.addEventListener('input', function () {
-
+        refreshButtons()
     });
 
     maxBrightnessInput.addEventListener('input', function () {
-
+        refreshButtons()
     });
     let isHideHSB = false;
     function hideShowHSB(){
@@ -150,6 +175,7 @@
             max: parseInt(maxBrightnessInput.value)}
     }
     function nextColor(){
+       
         if(!hasBegin){
             hasBegin = true
             beginTime = new Date()
@@ -162,15 +188,23 @@
         let k = range.min + Math.round(Math.random() * (range.max - range.min))
         generateBlackWhiteImage(k)
     }
+    function changeColor(rgb){
+        if(changeBK.checked){
+            document.body.style.backgroundColor = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+        }
+        bwImage.style.backgroundColor = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+    }
     function generateBlackWhiteImage(nextBrightness) {
         let isRandomH = randomH.checked;
         let isRandomS = randomS.checked;
         let h = isRandomH? Math.round(Math.random() * 360): parseInt(H.value)
         let s = isRandomS? Math.round(Math.random() * 100): parseInt(S.value)
-        let hsb = hsbToRgb(h,
+        let b = nextBrightness? nextBrightness: parseInt(B.value)
+        let rgb = hsbToRgb(h,
             s,
-            nextBrightness? nextBrightness: parseInt(B.value))
-        bwImage.style.backgroundColor = `rgb(${hsb.r}, ${hsb.g}, ${hsb.b})`;
+            b)
+        changeColor(rgb)
+            
         B.value = nextBrightness?nextBrightness: parseInt(B.value)
         BValue.innerHTML = B.value
         H.value = h
@@ -280,16 +314,19 @@
         
         // let item = buttons.appendChild(`<button onclick="checkBrightness(${i * 10})">${i*10}</button>`)
         let s = ""
-        for(let i = 0; i < 10; i++){
+        let minB = parseInt(minBrightnessInput.value) / 10
+        let maxB = parseInt(maxBrightnessInput.value) / 10
+        let d = parseInt(maxBrightnessInput.value)
+        for(let i = minB; i < maxB; i++){
             let t = i* 10
-            s = s + `<button onclick="checkBrightness(${i*10})">${t}</button>` + ":"
-            for(let j = 0; j < 10 / parseInt(precision.value); ++j){
+            s = s + `<div class="key-note-container"><button class = 'key-note-button' onclick="checkBrightness(${i*10})">${t}</button>` + ":"
+            for(let j = 0; j < 10 / parseInt(precision.value) && t + j * parseInt(precision.value) < parseInt(maxBrightnessInput.value); ++j){
                 let tt = t +j * parseInt(precision.value)
-                s += `<button onclick="checkBrightness(${tt})">${tt}</button>` 
+                s += `<button class='key-note-button' onclick="checkBrightness(${tt})">${tt}</button>` 
             }
-            s+= '</br>'
+            s+= '</div></br>'
         }
-        s = s + `<button onclick="checkBrightness(100)">100</button>` + ":"
+        s = s + `<button class='key-note-button' onclick="checkBrightness(${d})">${d}</button>` + ":"
         buttons.innerHTML = s
     }
     refreshButtons()
