@@ -33,22 +33,35 @@
 <input type="text" id="textInput" placeholder="">
 <button onclick="readInput()">refresh</button>
 <div style="width: 100%; height:auto" id="video" ></div>
- <script>
-    var urlParams = new URLSearchParams(window.location.search);
+每<input type="text" id="interval" placeholder="" value = "4">分钟刷新视频
+刷新<input type="text" id="cnt" placeholder="" value = "10">次后清空
+<button onclick="refreshTimer()">save</button>
+<script>
+    var video = document.getElementById('video');
+    let interval = document.getElementById('interval');
+    let cnt = document.getElementById('cnt');
+    let timer = null
+    let cal = 0
 
-    // 使用 get() 方法获取指定参数的值
-    let roomId = urlParams.get('roomid');
+    let player = null;
+    var roomId = null;
+    var urlParams = new URLSearchParams(window.location.search);
+    roomId = urlParams.get('roomid');
+    document.getElementById('textInput').value = roomId
     console.log(roomId)
     if(roomId){
-        refresh(roomId)
+        refresh()
+        refreshTimer()
     }
     function readInput() {
-    // 获取输入框的值
-        var roomId = document.getElementById('textInput').value;
-        refresh(roomId)
+        roomId = document.getElementById('textInput').value;
+        refresh()
     }
-    function refresh(roomId){
+    function refresh(){
+        roomId = document.getElementById('textInput').value;
+        clearVideo()
         console.log(roomId)
+
         $.ajax({
             url: "https://junlong.plus/ztool/live/bilibili/" + roomId,
             type: "get",
@@ -61,8 +74,74 @@
             }
         });
     };
+    function showData(data) {
+        var str = "";//定义用于拼接的字符串
+        // console.log(data)
+        liveLink = getLiveLink(data)
+        divInfo = getImgInfo(data)
+        userName = getUserName(divInfo)
+        roomTitle = getRoomTitle(divInfo)
+        document.title = userName + "-" + roomTitle
 
-    function getLiveLink(data){
+        document.getElementById('info').innerHTML = divInfo
+        playhls(liveLink)
+    }
+    function playhls(url){
+        
+        var videoSrc = url;
+        
+        if (document.createElement('video').canPlayType('application/vnd.apple.mpegurl')) {
+        // 原生支持 hls 播放
+            player = new Player({
+                el: document.querySelector('#video'),
+                isLive: true,
+                url: videoSrc, // hls 流地址
+                autoplay: true
+            })
+            console.log("support")
+        }else{
+            console.log("not support")
+            
+            player = new HlsJsPlayer({
+                "id": "video",
+                "url": videoSrc,
+                "playsinline": false,
+                "whitelist": [
+                        ""
+                ],
+                "autoplay": true
+            });
+            
+                
+        }
+  }
+    function refreshTimer(){
+        cal = 0
+        if(timer){
+            clearInterval(timer)
+            timer = null
+        }
+        timer = setInterval(()=>{
+            cal++
+            if(cal < parseInt(cnt.value)){
+                refresh(roomId)
+            }else{
+                clearVideo()
+                clearInterval(timer)
+                timer = null
+
+            }
+        }, parseInt(interval.value) * 60 * 1000)
+    }
+    function clearVideo(){
+        if(player){
+            player.src = ''
+
+        }
+        player = null
+        video.innerHTML = null
+    }
+  function getLiveLink(data){
         let k = /url: '(.*?)'/
         let matches = data.match(k)
         return matches[1]
@@ -85,56 +164,7 @@
         console.log(matches)
         return matches[1]
     }
-    function showData(data) {
-        var str = "";//定义用于拼接的字符串
-        // console.log(data)
-        liveLink = getLiveLink(data)
-        divInfo = getImgInfo(data)
-        userName = getUserName(divInfo)
-        roomTitle = getRoomTitle(divInfo)
-        document.title = userName + "-" + roomTitle
-
-        document.getElementById('info').innerHTML = divInfo
-        playhls(liveLink)
-    }
-    function playhls(url){
-        var video = document.getElementById('video');
-        var videoSrc = url;
-        
-        if (document.createElement('video').canPlayType('application/vnd.apple.mpegurl')) {
-        // 原生支持 hls 播放
-            let player = new Player({
-                el: document.querySelector('#video'),
-                isLive: true,
-                url: videoSrc, // hls 流地址
-            })
-            console.log("support")
-        }else{
-            console.log("not support")
-            
-            let player = new HlsJsPlayer({
-                "id": "video",
-                "url": videoSrc,
-                "playsinline": false,
-                "whitelist": [
-                        ""
-                ],
-                "autoplay": true
-            });
-            
-                
-        }
-        // if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        //     video.src = videoSrc;
-		// 		video.addEventListener('canplay', function () {
-		// 	  video.play();
-		// 	});
-        // } else if (Hls.isSupported()) {
-        //     var hls = new Hls();
-        //     hls.loadSource(videoSrc);
-        //     hls.attachMedia(video);
-        // }
-  }
+   
 </script>
 
 <script>
