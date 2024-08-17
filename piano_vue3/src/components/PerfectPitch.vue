@@ -65,7 +65,22 @@
 			return Math.ceil(Number(val * (max - min )) + min - 1);
     }
   }
-
+	const listenKeySeq = 'awsedftgyhuj'
+	function getIndexFromSeq(s: string): number{
+		for(let i = 0 ; i < 12; ++i){
+			console.log("getIndexFromSeq " + s)
+			if(s === listenKeySeq[i]){
+				return i 
+			}
+		}
+		return 0
+	}
+	document.addEventListener('keydown', listenKey);
+	function listenKey(event: KeyboardEvent) {
+		let index: number = getIndexFromSeq(event.key)
+		keyNoteClick(index + 1)
+		
+	}
   const random = new rand();
 
 	let completed = ref(0);
