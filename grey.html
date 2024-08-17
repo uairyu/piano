@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Black and White Brightness Discrimination</title>
+<style>
+    #bwImage {
+        width: 400px;
+        height: 150px;
+        border: 1px solid #000;
+    }
+    #brightnessControls {
+        margin-top: 20px;
+    }
+    #result {
+        margin-top: 20px;
+    }
+    .statistic-container {
+        display: flex;
+        max-width: 450px;
+        justify-content: space-evenly;
+        align-items: center;
+        align-content: space-around;
+        flex-flow: row;
+        margin: auto
+    }
+    .statistic-container .statistic-panel {
+        background-color: #886c41;
+        color: #f0f8ff;
+        padding: .5em;
+        border-radius: 5px;
+        font-size: 75%;
+        font-weight: 700;
+        white-space: nowrap
+    }
+    .key-note-container{
+        margin: 5px auto auto;
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        flex-flow: row wrap;
+        align-items: center;
+        align-content: center
+    }
+    .key-note-button {
+        padding: 0;
+        /* width: 33px; */
+        height: 35px;
+        text-align: center;
+		/* max-width: 100px; */
+		flex: 1 0 auto;
+        margin-right: 1%;
+        /* margin-bottom: 5px */
+    }
+	.key-note-button:last-child {
+        margin-right: 0px;
+    }
+</style>
+</head>
+<body>
+<div id="bwImage"></div>
+<button onclick="foldConfig()" style="width: 100%;">↕</button>
+<div id = 'configGroup' style="display: block;">
+	<div style="display: flex;height:100%; width: 100%;">
+		<div style="width: 55%;">
+			<div id="brightnessControls" >
+				<label for="H">H:</label>
+				<input type="range" id="H" min="0" max="360" value="0">
+				<span id = "HValue"></span>
+				<br>
+				<label for="S">S:</label>
+				<input type="range" id="S" min="0" max="100" value="0">
+				<span id = "SValue"></span>
+				<br>
+				<label for="B">B:</label>
+				<input type="range" id="B" min="0" max="100" value="0">
+				<span id = "BValue"></span>
+			</div>
+			<label for="maxPrecision">精度:</label>
+			<input type="range" id="precision" min="1" max="10" value="5">
+			<span id = "curPrecision">5</span>
+			<br>
+			<span>选择与正确答案的误差范围为±<span id="calPrecision">2</span></span>
+			<br>
+			<button id="showHSB" onclick = "hideShowHSB()">hide HSB</button>
+		</div>
+		<div style="width: 45%;">
+			<label for="minBrightness">Min Brightness:</label>
+			<input type="range" id="minBrightness" min="0" max="100" value="0">
+			<span id = "minBValue">0</span>
+			<br>
+			<label for="maxBrightness">Max Brightness:</label>
+			<input type="range" id="maxBrightness" min="0" max="100" value="100">
+			<span id = "maxBValue">100</span>
+			
+		</div>
+	</div>
+	<div>
+		<input type="checkbox" id="randomH"> random H</input>
+		<input type="checkbox" id="randomS"> random S</input>
+		<input type="checkbox" id="changeBK">背景色都改</input>
+	</div>
+</div>
+<div>
+	<button style="height: 30px;width: 100%; "onclick="nextColor()">next</button>
+</div>
+<div class="statistic-container ">
+  <span class="statistic-panel">B相差: <span id = "dis" style="font-size: 24px;"></span></span>
+  <span class="statistic-panel">正确: <span id = 'correct'>0</span></span>
+  <span class="statistic-panel">错误: <span id = 'fail'>0</span></span>
+  <span class="statistic-panel">正确率: <span id = 'score'>0</span>%</span>
+  <span class="statistic-panel">时间: <span id = 'sumTime'>0</span> 秒</span>
+  <span class="statistic-panel">平均时间: <span id="avgTime">0</span> 秒</span>
+</div>
+<div id="buttons" class="key-note-container">
+   
+</div>
+<div id="result"></div>
+<script>
+    let lastTime = new Date()
+    let beginTime = new Date()  
+    let hasBegin = false
+    const configGroup = document.getElementById('configGroup')
+    const changeBK = document.getElementById('changeBK')
+    const correct = document.getElementById('correct')
+    const fail = document.getElementById('fail')
+    const score = document.getElementById('score')
+    const sumTime = document.getElementById('sumTime')
+    const avgTime = document.getElementById('avgTime')
+    const dis = document.getElementById('dis')
+    const precision = document.getElementById('precision')
+    const calPrecision = document.getElementById('calPrecision')
+    const curPrecision = document.getElementById('curPrecision')
+    const bwImage = document.getElementById('bwImage');
+    const minBrightnessInput = document.getElementById('minBrightness');
+    const maxBrightnessInput = document.getElementById('maxBrightness');
+    const resultSpan = document.getElementById('result');
+    const H = document.getElementById('H')
+    const S = document.getElementById('S')
+    const B = document.getElementById('B')
+    const HValue = document.getElementById('HValue')
+    const SValue = document.getElementById('SValue')
+    const BValue = document.getElementById('BValue')
+    const maxBValue = document.getElementById('maxBValue')
+    const minBValue = document.getElementById('minBValue')
+    const showHSB = document.getElementById('showHSB')
+    const randomH = document.getElementById('randomH')
+    const randomS = document.getElementById('randomS')
+    precision.addEventListener('input', function () {
+        curPrecision.innerHTML = precision.value;
+        calPrecision.innerHTML = Math.floor(parseInt(precision.value)/2)
+        refreshButtons()
+    });
+    minBrightnessInput.addEventListener('input', function () {
+        minBValue.innerHTML = minBrightnessInput.value
+    });
+    maxBrightnessInput.addEventListener('input', function () {
+        maxBValue.innerHTML = maxBrightnessInput.value
+    });
+    H.addEventListener('input', function () {
+        HValue.innerHTML = H.value
+        generateBlackWhiteImage()
+    });
+
+    S.addEventListener('input', function () {
+         SValue.innerHTML = S.value
+         generateBlackWhiteImage()
+    });
+    B.addEventListener('input', function () {
+         BValue.innerHTML = B.value
+         generateBlackWhiteImage()
+    });
+    minBrightnessInput.addEventListener('input', function () {
+        refreshButtons()
+    });
+
+    maxBrightnessInput.addEventListener('input', function () {
+        refreshButtons()
+    });
+    let isHideHSB = false;
+	function foldConfig(){
+		if(configGroup.style.display == 'none'){
+			configGroup.style.display = 'block'
+		}else{
+			configGroup.style.display = 'none'
+		}
+	}
+    function hideShowHSB(){
+        isHideHSB ^= true
+        brightnessControls.style.opacity = isHideHSB? "0": "100";
+    }
+    function getBrightnessRange(){
+        return {min: parseInt(minBrightnessInput.value),
+            max: parseInt(maxBrightnessInput.value)}
+    }
+    function nextColor(){
+        if(!hasBegin){
+            hasBegin = true
+            beginTime = new Date()
+            lastTime = beginTime
+            setInterval(()=>{
+                sumTime.innerHTML = diffInSeconds(new Date(), beginTime)
+            }, 1000)
+        }
+        range = getBrightnessRange()
+        let k = range.min + Math.round(Math.random() * (range.max - range.min))
+        generateBlackWhiteImage(k)
+    }
+    function changeColor(rgb){
+        if(changeBK.checked){
+            document.body.style.backgroundColor = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+        }
+        bwImage.style.backgroundColor = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+    }
+    function generateBlackWhiteImage(nextBrightness) {
+        let isRandomH = randomH.checked;
+        let isRandomS = randomS.checked;
+        let h = isRandomH? Math.round(Math.random() * 360): parseInt(H.value)
+        let s = isRandomS? Math.round(Math.random() * 100): parseInt(S.value)
+        let b = nextBrightness? nextBrightness: parseInt(B.value)
+        let rgb = hsbToRgb(h,
+            s,
+            b)
+        changeColor(rgb)
+            
+        B.value = nextBrightness?nextBrightness: parseInt(B.value)
+        BValue.innerHTML = B.value
+        H.value = h
+        HValue.innerHTML = h
+        S.value = s
+        SValue.innerHTML = s
+    }
+    function getRGBString(h,s,b){
+        let hsb = hsbToRgb(h,
+            s,
+            b)
+        return `rgb(${hsb.r}, ${hsb.g}, ${hsb.b})`;
+    }
+
+    function updateStatis(isCorrect){
+        let curB = parseInt(B.value);
+        let curPre = parseInt(precision.value)
+        correct.innerHTML = parseInt(correct.innerHTML) + (isCorrect? 1:0);
+        fail.innerHTML = parseInt(fail.innerHTML) + (isCorrect? 0:1);
+        if(isCorrect){
+            dis.innerHTML = curB - targetBrightness
+            let rate = 1-(Math.abs(targetBrightness - curB))/curPre
+            dis.style.color = getRGBString(120 * rate, 100, 100*rate)
+            lastTime = new Date()
+            let secs = diffInSeconds(lastTime, beginTime)
+            avgTime.innerHTML = (secs / parseInt(correct.innerHTML)).toFixed(2)
+        }
+        let a = parseFloat(correct.innerHTML) 
+                        /(parseFloat(correct.innerHTML) + parseFloat(fail.innerHTML) )
+        score.innerHTML = (a
+                        * 100).toFixed(1)
+    }
+    let targetBrightness = 0
+    function checkBrightness(clickTargetBrightness) {
+        targetBrightness = clickTargetBrightness
+        let curB = parseInt(B.value);
+        let curPre = parseInt(precision.value)
+        let isCorrect = false
+        if(Math.abs(targetBrightness - curB) <= Math.floor(curPre / 2)){
+            isCorrect = true
+        }else{
+            isCorrect = false
+        }
+        updateStatis(isCorrect)
+        if(isCorrect){
+            nextColor()
+        }
+    }
+
+    function calculateBrightness() {
+        return parseInt(B.value);
+    }
+    function diffInSeconds(date1, date2) {
+        // 将日期转换为毫秒
+        const time1 = date1.getTime();
+        const time2 = date2.getTime();
+
+        // 计算差值并转换为秒数
+        const diff = Math.abs(time1 - time2);
+        const seconds = Math.floor(diff / 1000);
+
+        return seconds;
+    }
+    function hsbToRgb(h, s, b) {
+        // HSB to RGB conversion algorithm
+        // h: hue (0-360), s: saturation (0-100), b: brightness (0-100)
+        // Returns an object with r, g, and b properties (each in range 0-255)
+
+        let hue = h / 60;
+        let saturation = s / 100;
+        let brightness = b / 100;
+
+        let chroma = brightness * saturation;
+        let hue1 = hue % 2 - 1;
+        let x = chroma * (1 - Math.abs(hue1));
+
+        let r1, g1, b1;
+
+        if (hue >= 0 && hue < 1) {
+            [r1, g1, b1] = [chroma, x, 0];
+        } else if (hue >= 1 && hue < 2) {
+            [r1, g1, b1] = [x, chroma, 0];
+        } else if (hue >= 2 && hue < 3) {
+            [r1, g1, b1] = [0, chroma, x];
+        } else if (hue >= 3 && hue < 4) {
+            [r1, g1, b1] = [0, x, chroma];
+        } else if (hue >= 4 && hue < 5) {
+            [r1, g1, b1] = [x, 0, chroma];
+        } else {
+            [r1, g1, b1] = [chroma, 0, x];
+        }
+
+        let m = brightness - chroma;
+
+        return {
+            r: Math.round((r1 + m) * 255),
+            g: Math.round((g1 + m) * 255),
+            b: Math.round((b1 + m) * 255)
+        };
+    }
+
+</script>
+<script>
+    const buttons = document.getElementById('buttons');
+    function refreshButtons(){
+        buttons.innerHTML = ""
+        
+        // let item = buttons.appendChild(`<button onclick="checkBrightness(${i * 10})">${i*10}</button>`)
+        let s = ""
+        let minB = parseInt(minBrightnessInput.value) / 10
+        let maxB = parseInt(maxBrightnessInput.value) / 10
+        let d = parseInt(maxBrightnessInput.value)
+        for(let i = minB; i < maxB; i++){
+            let t = i* 10
+            s = s + `<div class="key-note-container"><button class = 'key-note-button' onclick="checkBrightness(${i*10})">${t}</button>`
+            for(let j = 0; j < 10 / parseInt(precision.value) && t + j * parseInt(precision.value) < parseInt(maxBrightnessInput.value); ++j){
+                let tt = t +j * parseInt(precision.value)
+                s += `<button class='key-note-button' onclick="checkBrightness(${tt})">${tt}</button>` 
+            }
+            s+= '</div></br>'
+        }
+        s = s + `<button class='key-note-button' onclick="checkBrightness(${d})">${d}</button>` 
+        s = s + `<button class='key-note-button' onclick="checkBrightness(${d})">${d}</button>` 
+        buttons.innerHTML = s
+    }
+    refreshButtons()
+</script>
+
+</body>
+</html>

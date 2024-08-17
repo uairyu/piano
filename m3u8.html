@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/0.5.14/hls.min.js"></script>
+    
+	<!-- <script src="https://registry.npmmirror.com/xgplayer/3.0.18/files/dist/index.min.js"></script> -->
+    <script src="//unpkg.byted-static.com/xgplayer/2.31.6/browser/index.js" charset="utf-8"></script>
+    <script src="//unpkg.byted-static.com/xgplayer-hls.js/2.2.2/browser/index.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="https://registry.npmmirror.com/mdui/1/files/dist/css/mdui.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3U8 Video Player</title>
+    <style>
+    /* 为网格布局内的元素添加圆角效果 */
+    .mdui-col > div, .mdui-col > a {
+        border-radius: 10px;
+        transition: transform .5s;
+    }
+
+    .mdui-col > div:hover {
+        /* 渐变背景色 */
+        background: linear-gradient(-45deg, #009688, #B2DFDB);
+        color: white;
+        transform: translateY(-5px);
+    }
+</style>
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<body>
+<div id = "info"></div>
+<input type="text" id="textInput" placeholder="">
+<button onclick="readInput()">refresh</button>
+<div style="width: 100%; height:auto" id="video" ></div>
+每<input type="text" id="interval" placeholder="" value = "4">分钟刷新视频
+刷新<input type="text" id="cnt" placeholder="" value = "10">次后清空
+<button onclick="refreshTimer()">save</button>
+<script>
+    var video = document.getElementById('video');
+    let interval = document.getElementById('interval');
+    let cnt = document.getElementById('cnt');
+    let timer = null
+    let cal = 0
+
+    let player = null;
+    var roomId = null;
+    var urlParams = new URLSearchParams(window.location.search);
+    roomId = urlParams.get('roomid');
+    document.getElementById('textInput').value = roomId
+    console.log(roomId)
+    if(roomId){
+        refresh()
+        refreshTimer()
+    }
+    function readInput() {
+        roomId = document.getElementById('textInput').value;
+        refresh()
+    }
+    function refresh(){
+        roomId = document.getElementById('textInput').value;
+        clearVideo()
+        console.log(roomId)
+
+        $.ajax({
+            url: "https://junlong.plus/ztool/live/bilibili/" + roomId,
+            type: "get",
+            dataType: "html",
+            success: function(data){
+                showData(data);
+            },
+            error: function(msg){
+                alert("ajax连接异常："+msg);
+            }
+        });
+    };
+    function showData(data) {
+        var str = "";//定义用于拼接的字符串
+        // console.log(data)
+        liveLink = getLiveLink(data)
+        divInfo = getImgInfo(data)
+        userName = getUserName(divInfo)
+        roomTitle = getRoomTitle(divInfo)
+        document.title = userName + "-" + roomTitle
+
+        document.getElementById('info').innerHTML = divInfo
+        playhls(liveLink)
+    }
+    function playhls(url){
+        
+        var videoSrc = url;
+        
+        if (document.createElement('video').canPlayType('application/vnd.apple.mpegurl')) {
+        // 原生支持 hls 播放
+            player = new Player({
+                el: document.querySelector('#video'),
+                isLive: true,
+                url: videoSrc, // hls 流地址
+                autoplay: true
+            })
+            console.log("support")
+        }else{
+            console.log("not support")
+            
+            player = new HlsJsPlayer({
+                "id": "video",
+                "url": videoSrc,
+                "playsinline": false,
+                "whitelist": [
+                        ""
+                ],
+                "autoplay": true
+            });
+            
+                
+        }
+  }
+    function refreshTimer(){
+        cal = 0
+        if(timer){
+            clearInterval(timer)
+            timer = null
+        }
+        timer = setInterval(()=>{
+            cal++
+            if(cal < parseInt(cnt.value)){
+                refresh(roomId)
+            }else{
+                clearVideo()
+                clearInterval(timer)
+                timer = null
+
+            }
+        }, parseInt(interval.value) * 60 * 1000)
+    }
+    function clearVideo(){
+        if(player){
+            player.src = ''
+
+        }
+        player = null
+        video.innerHTML = null
+    }
+  function getLiveLink(data){
+        let k = /url: '(.*?)'/
+        let matches = data.match(k)
+        return matches[1]
+    }
+    function getImgInfo(data){
+        let k = /<div style="width: 100%;min-height: 100px;">[\d\D]*?<\/div>/
+        let matches = data.match(k)
+        console.log(matches)
+        return matches[0]
+    }
+    function getUserName(data){
+        let k = /<span.*?>(.*?)<\/span>/
+        let matches = data.match(k)
+        console.log(matches)
+        return matches[1]
+    }
+    function getRoomTitle(data){
+        let k = /<h6.*?>(.*?)<\/h6>/
+        let matches = data.match(k)
+        console.log(matches)
+        return matches[1]
+    }
+   
+</script>
+
+<script>
+
+</script>
+
+</body>
+</html>
