@@ -73,10 +73,13 @@
 				return i 
 			}
 		}
-		return 0
+		return -1
 	}
 	document.addEventListener('keydown', listenKey);
 	function listenKey(event: KeyboardEvent) {
+		if(event.key === 'q'){
+			hearAgain()
+		}
 		let index: number = getIndexFromSeq(event.key)
 		keyNoteClick(index + 1)
 		
