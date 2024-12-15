@@ -49,7 +49,7 @@
 
     roomId = urlParams.get('roomid');
     document.getElementById('textInput').value = roomId
-    
+
     console.log(roomId)
     detectErrorInterval = setInterval(detectErrorRefresh, 3000)
     if(roomId){
@@ -59,7 +59,7 @@
 
     function detectErrorRefresh(){
         let c = document.getElementsByClassName("xgplayer-error")[0].style.display
-        if (c !== ''){
+        if (window.getComputedStyle(k).display !== 'none'){
             document.getElementsByClassName("xgplayer-error-refresh")[0].click()
         }
     }
