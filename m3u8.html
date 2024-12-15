@@ -46,12 +46,22 @@
     let player = null;
     var roomId = null;
     var urlParams = new URLSearchParams(window.location.search);
+
     roomId = urlParams.get('roomid');
     document.getElementById('textInput').value = roomId
+    
     console.log(roomId)
+    detectErrorInterval = setInterval(detectErrorRefresh, 3000)
     if(roomId){
         refresh()
         refreshTimer()
+    }
+
+    function detectErrorRefresh(){
+        let c = document.getElementsByClassName("xgplayer-error")[0].style.display
+        if (c !== ''){
+            document.getElementsByClassName("xgplayer-error-refresh")[0].click()
+        }
     }
     function readInput() {
         roomId = document.getElementById('textInput').value;
@@ -101,7 +111,6 @@
             console.log("support")
         }else{
             console.log("not support")
-            
             player = new HlsJsPlayer({
                 "id": "video",
                 "url": videoSrc,
