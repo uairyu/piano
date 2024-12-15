@@ -58,8 +58,8 @@
     }
 
     function detectErrorRefresh(){
-        let c = document.getElementsByClassName("xgplayer-error")[0].style.display
-        if (window.getComputedStyle(k).display !== 'none'){
+        let c = document.getElementsByClassName("xgplayer-is-error").length
+        if (c > 0){
             document.getElementsByClassName("xgplayer-error-refresh")[0].click()
         }
     }
