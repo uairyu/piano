@@ -3,15 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer" />
-	<script src="hls.min.js"></script>
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/0.5.14/hls.min.js"></script> -->
-    
-	<!-- <script src="https://registry.npmmirror.com/xgplayer/3.0.18/files/dist/index.min.js"></script> -->
-    <!-- <script src="//unpkg.byted-static.com/xgplayer/2.31.6/browser/index.js" charset="utf-8"></script>
-    <script src="//unpkg.byted-static.com/xgplayer-hls.js/2.2.2/browser/index.js" charset="utf-8"></script> -->
-    <script src="index.js" charset="utf-8"></script>
-    <script src="index_2.js" charset="utf-8"></script>
 
+<!-- <script src="
+https://cdn.jsdelivr.net/npm/xgplayer@3.0.0-alpha.146/dist/index.min.js
+"></script>
+<link href="
+https://cdn.jsdelivr.net/npm/xgplayer@3.0.0-alpha.146/dist/xgplayer.min.css
+" rel="stylesheet">
+<script src="
+https://cdn.jsdelivr.net/npm/xgplayer-hls@3.0.20/dist/index.min.js
+"></script>
+<script src="
+https://cdn.jsdelivr.net/npm/xgplayer-flv@3.0.20/dist/index.min.js
+"></script> -->
+<script src="xgindex.min.js"></script> 
+<script src="xgflvindex.min.js"></script> 
+<script src="xghlsindex.min.js"></script> 
+    <link rel="stylesheet" href="xgplayer.min.css">
     <!-- <link rel="stylesheet" href="https://registry.npmmirror.com/mdui/1/files/dist/css/mdui.min.css"> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M3U8 Video Player</title>
@@ -33,8 +41,12 @@
 </head>
 <body>
 <div id = "info"></div>
+<div id = "tittle"></div>
 <input type="text" id="textInput" placeholder="">
 <button onclick="readInput()">refresh</button>
+<div id = 'links'>
+
+</div>
 <div style="width: 100%; height:auto" id="video" ></div>
 每<input type="text" id="interval" placeholder="" value = "4">分钟刷新视频
 刷新<input type="text" id="cnt" placeholder="" value = "10">次后清空
@@ -55,11 +67,31 @@
 
     console.log(roomId)
     detectErrorInterval = setInterval(detectErrorRefresh, 3000)
+    jQuery.support.cors = true
     if(roomId){
         refresh()
         refreshTimer()
     }
+    function createOption(text, order, onClick) {
+        // 创建一个新的 option 元素
+        const option = document.createElement('option');
 
+        // 设置 option 的文本内容和 value 值
+        option.textContent = text;
+        option.value = order;
+
+        // 添加自定义属性 order
+        option.setAttribute('order', order);
+
+        // 添加点击事件监听器
+        option.addEventListener('click', () => {
+            onClick(order);
+        });
+
+        return option;
+        }
+
+   
     function detectErrorRefresh(){
         let c = document.getElementsByClassName("xgplayer-is-error").length
         if (c > 0){
@@ -75,10 +107,30 @@
         clearVideo()
         console.log(roomId)
 
+        // $.ajax({
+        //     url: "https://junlong.plus/ztool/live/bilibili/" + roomId,
+        //     type: "get",
+        //     dataType: "html",
+        //     success: function(data){
+        //         showData(data);
+        //     },
+        //     error: function(msg){
+        //         alert("ajax连接异常："+msg);
+        //     }
+        // });
+        k = ""
         $.ajax({
-            url: "https://junlong.plus/ztool/live/bilibili/" + roomId,
+            // url: "https://live.bilibili.com/" + 31847725,
+            url: "https://api.codetabs.com/v1/proxy/?quest=https://live.bilibili.com/" + roomId,
             type: "get",
-            dataType: "html",
+            xhrFields:
+                {'Access-Control-Allow-Origin': '*'},
+            // headers:{
+            //     "Access-Control-Allow-Origin":"*",
+                
+            //    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
+            // },
+            // dataType: "html",
             success: function(data){
                 showData(data);
             },
@@ -87,17 +139,41 @@
             }
         });
     };
+    let glo = ''
+    let links = ''
+    let selectIndex = 0;
     function showData(data) {
         var str = "";//定义用于拼接的字符串
         // console.log(data)
-        liveLink = getLiveLink(data)
-        divInfo = getImgInfo(data)
-        userName = getUserName(divInfo)
-        roomTitle = getRoomTitle(divInfo)
+        glo = data
+        liveLink = getLiveLink1(data)
+        divInfo = getImgInfo1(data)
+        userName = getUserName1(data)
+        roomTitle = getRoomTitle1(data)
+        // userName = getUserName(divInfo)
+        // roomTitle = getRoomTitle(divInfo)
         document.title = userName + "-" + roomTitle
 
-        document.getElementById('info').innerHTML = divInfo
-        playhls(liveLink)
+        document.getElementById('info').innerHTML = `<img style="width:100px;height:100px" src = "${divInfo}"/>`
+        document.getElementById('tittle').innerHTML = `${roomTitle}`
+        s = ''
+        links = liveLink
+        // for(let i = 0 ;i < liveLink.length; ++i){
+        //     s+=`<p>${liveLink[i]}</p></br>`
+        // }
+        // document.getElementById('links').innerHTML = s
+             // 示例用法：
+        const selectElement = document.getElementById('links'); // 获取 select 元素
+        selectElement.innerHTML = ''
+        for (let i = 0; i < links.length; i++) {
+            const option = createOption(`${links[i]}`, i, (order) => {
+                selectIndex = i;
+                refresh()
+                // 在这里执行你想要的操作，比如发送请求等
+            });
+            selectElement.appendChild(option);
+        }
+        playhls(liveLink[selectIndex])
     }
     function playhls(url){
         
@@ -114,15 +190,22 @@
             console.log("support")
         }else{
             console.log("not support")
-            player = new HlsJsPlayer({
-                "id": "video",
+            player = new Player({
+                "el":document.querySelector('#video'),
                 "url": videoSrc,
-                "playsinline": false,
-                "whitelist": [
-                        ""
-                ],
-                "autoplay": true
+                "autoplay": true,
+                plugins: [window.FlvPlayer]
             });
+            // player = new HlsJsPlayer({
+            //     "id": "video",
+            //     "url": videoSrc,
+            //     "playsinline": false,
+            //     "whitelist": [
+            //             ""
+            //     ],
+            //     "autoplay": true,
+            //     "plugins": [window.FlvPlayer]
+            // });
             
                 
         }
@@ -153,7 +236,74 @@
         player = null
         video.innerHTML = null
     }
-  function getLiveLink(data){
+    function getLiveLink1(data){
+        // let k = /\_name":"http_hls"([\s\S]+?)"master/
+        let k = /("stream":[\s\S]+?)"p2p_data"/
+        let streamContent = data.match(k)[1]
+        // console.log(streamContent)
+        let makeJson = ("{" + `${streamContent}`.slice(0, streamContent.length -1 ) + "}")
+        makeJson = eval("(" + makeJson +")")
+        console.log(makeJson)
+
+        // let hostMatches = streamContent.matchAll(/(https:.*?)"/g)
+        // let hostArray = Array.from(hostMatches)
+        // let extraArray = Array.from(streamContent.matchAll(/"extra":"(.*?)"/g))
+        // console.log(hostArray[0][1])
+        // console.log(extraArray)
+        // let baseUrlRe = /"base_url":"([\s\S]+?)"hdr_qn"/g
+        // let baseUrls = Array.from(streamContent.matchAll(baseUrlRe))
+        // console.log(baseUrls)
+        
+        // let host = hostArray[0][1]
+        // let extra = extraArray[0][1]
+        // let baseUrl = baseUrls[0][1].match(/(.*?)","/)
+        // let full = (`${host}${baseUrl[1]}${extra}`)
+        let full = []
+        for(let o in makeJson){
+            console.log(makeJson[o])
+            let tmp =  makeJson[o]
+            for(let a in tmp){
+                let  format = tmp[a]['format']
+                // console.log(format)
+                for(let e in format) {
+                    let t2 = format[e]['codec']
+                    console.log(t2)
+                    for(let info in t2){
+                        let t3 = t2[info]
+                        baseUrl = t3['base_url']
+                        let  t4 = t3['url_info'][info]
+                        host = t4['host']
+                        extra = t4['extra']
+                        full.push(`${host}${baseUrl}${extra}`.replaceAll('\\u002F', '/'))
+                        console.log(`${host}${baseUrl}${extra}`)
+                    }
+                };
+            }
+        };
+        console.log(full)
+        return full
+    }
+    let img = ''
+    function getImgInfo1(data){
+        let k = /"face":"(.*?)"/
+        let matches = data.match(k)
+        img = matches[1].replaceAll('\\u002F', '/')
+        console.log(matches[1])
+        return img
+    }
+    function getUserName1(data){
+        let k = /base_info"[\s\S]+?"uname":"([\s\S]*?)"/
+        let matches = data.match(k)
+        console.log(matches)
+        return matches[1].replaceAll('\\u002F', '/')
+    }
+    function getRoomTitle1(data){
+        let k = /room_info":.*?title":"([\s\S]*?)"/
+        let matches = data.match(k)
+        console.log(matches)
+        return matches[1].replaceAll('\\u002F', '/')
+    }
+    function getLiveLink(data){
         let k = /url: '(.*?)'/
         let matches = data.match(k)
         return matches[1]
@@ -170,6 +320,7 @@
         console.log(matches)
         return matches[1]
     }
+   
     function getRoomTitle(data){
         let k = /<h6.*?>(.*?)<\/h6>/
         let matches = data.match(k)
@@ -177,9 +328,7 @@
         return matches[1]
     }
    
-</script>
 
-<script>
 
 </script>
 
