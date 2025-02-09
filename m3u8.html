@@ -178,37 +178,37 @@ https://cdn.jsdelivr.net/npm/xgplayer-flv@3.0.20/dist/index.min.js
     function playhls(url){
         
         var videoSrc = url;
-        
-        if (document.createElement('video').canPlayType('application/vnd.apple.mpegurl')) {
-        // 原生支持 hls 播放
-            player = new Player({
-                el: document.querySelector('#video'),
-                isLive: true,
-                url: videoSrc, // hls 流地址
-                autoplay: true
-            })
-            console.log("support")
-        }else{
-            console.log("not support")
-            player = new Player({
+        player = new Player({
                 "el":document.querySelector('#video'),
                 "url": videoSrc,
                 "autoplay": true,
                 plugins: [window.FlvPlayer]
             });
-            // player = new HlsJsPlayer({
-            //     "id": "video",
-            //     "url": videoSrc,
-            //     "playsinline": false,
-            //     "whitelist": [
-            //             ""
-            //     ],
-            //     "autoplay": true,
-            //     "plugins": [window.FlvPlayer]
-            // });
+        // if (document.createElement('video').canPlayType('application/vnd.apple.mpegurl')) {
+        // // 原生支持 hls 播放
+        //     player = new Player({
+        //         el: document.querySelector('#video'),
+        //         isLive: true,
+        //         url: videoSrc, // hls 流地址
+        //         autoplay: true
+        //     })
+        //     console.log("support")
+        // }else{
+        //     console.log("not support")
+            
+        //     // player = new HlsJsPlayer({
+        //     //     "id": "video",
+        //     //     "url": videoSrc,
+        //     //     "playsinline": false,
+        //     //     "whitelist": [
+        //     //             ""
+        //     //     ],
+        //     //     "autoplay": true,
+        //     //     "plugins": [window.FlvPlayer]
+        //     // });
             
                 
-        }
+        // }
   }
     function refreshTimer(){
         cal = 0
@@ -264,18 +264,22 @@ https://cdn.jsdelivr.net/npm/xgplayer-flv@3.0.20/dist/index.min.js
             let tmp =  makeJson[o]
             for(let a in tmp){
                 let  format = tmp[a]['format']
-                // console.log(format)
+                console.log("format")
+                console.log(format)
                 for(let e in format) {
                     let t2 = format[e]['codec']
+                    console.log(`t2 `)
                     console.log(t2)
                     for(let info in t2){
                         let t3 = t2[info]
                         baseUrl = t3['base_url']
-                        let  t4 = t3['url_info'][info]
-                        host = t4['host']
-                        extra = t4['extra']
-                        full.push(`${host}${baseUrl}${extra}`.replaceAll('\\u002F', '/'))
-                        console.log(`${host}${baseUrl}${extra}`)
+                        for(let url_infoChild in t3['url_info']){
+                            let  t4 = t3['url_info'][url_infoChild]
+                            host = t4['host']
+                            extra = t4['extra']
+                            full.push(`${host}${baseUrl}${extra}`.replaceAll('\\u002F', '/'))
+                            console.log(`full: ${host}${baseUrl}${extra}`)
+                        }
                     }
                 };
             }
